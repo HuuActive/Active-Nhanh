@@ -141,7 +141,11 @@ export function useAuth() {
     provider.setCustomParameters({ prompt: 'select_account' });
     try {
       await signInWithPopup(auth, provider);
-    } catch (error) {
+    } catch (error: any) {
+      if (error.code === 'auth/cancelled-popup-request' || error.code === 'auth/popup-closed-by-user') {
+        // User closed the popup, no need to log as error
+        return;
+      }
       console.error('Login error:', error);
     }
   };
