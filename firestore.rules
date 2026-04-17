@@ -1,0 +1,140 @@
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+//
+// Collection: products
+// Document ID: auto-generated
+// Fields:
+//   - name: string (required) - Product name
+//   - price: number (required) - Price in VND
+//   - description: string (required) - Combined markdown description
+//   - importantNote: string (optional) - Separate note field
+//   - deliveryProcess: string (optional) - Separate delivery field
+//   - features: string (optional) - Separate features field
+//   - warranty: string (optional) - Separate warranty field
+//   - faqs: string (optional) - Separate FAQ field
+//   - category: string (required) - Category (Storage, AI, etc.)
+//   - image: string (required) - Image URL or DataURL
+//   - rating: number (optional) - Average rating
+//   - reviews: number (optional) - Review count
+//   - stock: number (required) - Quantity in stock
+//   - seoTitle: string (optional) - SEO Title
+//   - seoDescription: string (optional) - SEO Meta Description
+//   - seoKeywords: string (optional) - SEO Keywords
+//
+// Collection: users
+// Document ID: userId
+// Fields:
+//   - uid: string (required) - Firebase Auth UID
+//   - email: string (required) - User email
+//   - role: string (required, enum: ['admin', 'user']) - User role
+//   - emailVerified: bool (optional) - Verification status
+//   - displayName: string (optional) - User's name
+//
+// ===============================================================
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        (request.auth.token.email == "huulaptop.info@gmail.com") ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
+      );
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    // ===============================================================
+    // Validation Functions
+    // ===============================================================
+
+    function isValidProduct(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() < 200 &&
+             data.price is number && data.price >= 0 &&
+             data.stock is number && data.stock >= -1000000 && // Allow some negative for overselling if needed, but usually >= 0
+             data.description is string && data.description.size() < 10000 &&
+             data.category is string &&
+             data.image is string && data.image.size() < 1200000; // Allow for DataURL images (up to ~1.2MB)
+    }
+
+    function isValidUser(data) {
+      return data.uid == request.auth.uid &&
+             data.email is string &&
+             data.role in ['admin', 'user'] &&
+             (!('emailVerified' in data) || data.emailVerified is bool) &&
+             (!('displayName' in data) || data.displayName is string);
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /products/{productId} {
+      allow read: if true; 
+      allow create: if isAdmin();
+      allow update: if isAdmin() || (
+        isAuthenticated() && 
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['stock'])
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isAuthenticated() && isOwner(userId) && isValidUser(request.resource.data) && 
+        (request.resource.data.role == 'user' || (request.resource.data.role == 'admin' && request.auth.token.email == "huulaptop.info@gmail.com"));
+      allow update: if isAdmin() || (isOwner(userId) && request.resource.data.role == resource.data.role && isValidUser(request.resource.data));
+    }
+
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if request.resource.data.isApproved == false;
+      allow update: if isAdmin() || (
+        // Allow users to add replies if they are authenticated
+        isAuthenticated() && 
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['replies']) &&
+        request.resource.data.isApproved == resource.data.isApproved
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /consultations/{consultationId} {
+      allow read: if isAdmin();
+      allow create: if true; // Anyone can request consultation
+      allow update, delete: if isAdmin();
+    }
+
+    match /orders/{orderId} {
+      allow read: if isAdmin() || (isAuthenticated() && request.auth.token.email == resource.data.customerInfo.email);
+      allow create: if true; // Allow guest checkout
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}
