@@ -59,14 +59,14 @@ export default function ProductCard({ product, onAddToCart, onView }: ProductCar
         </div>
 
         {/* Quick Share */}
-        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute top-2 right-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
           <div className="relative">
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 setIsSharing(!isSharing);
               }}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-tiktok-black shadow-lg backdrop-blur-sm transition-transform hover:scale-110"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-tiktok-black shadow-lg backdrop-blur-sm transition-transform hover:scale-110 active:scale-95"
             >
               <Share2 className="h-4 w-4" />
             </button>
@@ -81,15 +81,15 @@ export default function ProductCard({ product, onAddToCart, onView }: ProductCar
                 >
                   <button
                     onClick={(e) => handleShare(e, 'facebook')}
-                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-[10px] font-bold text-brand-600 hover:bg-brand-50 hover:text-[#1877F2]"
+                    className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-[11px] font-bold text-brand-600 hover:bg-brand-50 hover:text-[#1877F2]"
                   >
-                    <Facebook className="h-3 w-3" /> Facebook
+                    <Facebook className="h-4 w-4" /> Facebook
                   </button>
                   <button
                     onClick={(e) => handleShare(e, 'link')}
-                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-[10px] font-bold text-brand-600 hover:bg-brand-50 hover:text-tiktok-cyan"
+                    className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-[11px] font-bold text-brand-600 hover:bg-brand-50 hover:text-tiktok-cyan"
                   >
-                    <Link className="h-3 w-3" /> Copy Link
+                    <Link className="h-4 w-4" /> Sao chép link
                   </button>
                 </motion.div>
               )}
@@ -98,37 +98,37 @@ export default function ProductCard({ product, onAddToCart, onView }: ProductCar
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col pt-4">
-        <div className="mb-1 flex items-center justify-between">
+      <div className="flex flex-1 flex-col pt-3 md:pt-4">
+        <div className="mb-1 flex items-start gap-2 justify-between">
           <h3 
-            className="font-sans text-lg font-extrabold tracking-tight text-tiktok-black line-clamp-1 cursor-pointer hover:text-tiktok-cyan transition-colors"
+            className="font-sans text-base md:text-lg font-extrabold tracking-tight text-tiktok-black line-clamp-2 md:line-clamp-1 cursor-pointer hover:text-tiktok-cyan transition-colors"
             onClick={handleView}
           >
             {product.name}
           </h3>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 shrink-0 pt-1">
             <Star className="h-3 w-3 fill-tiktok-cyan text-tiktok-cyan" />
             <span className="text-xs font-bold text-tiktok-black">{product.rating}</span>
           </div>
         </div>
         <div className="mb-2 flex items-center gap-2">
-          <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${product.stock > 0 ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
-            {product.stock > 0 ? 'Sẵn sàng kích hoạt' : 'Hết hàng'}
+          <span className={`text-[9px] md:text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${product.stock > 0 ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+            {product.stock > 0 ? 'Sẵn sàng' : 'Hết hàng'}
           </span>
         </div>
-        <p className="mb-4 line-clamp-2 text-sm font-medium text-brand-500">
+        <p className="mb-3 md:mb-4 line-clamp-2 text-xs md:text-sm font-medium text-brand-500">
           {product.shortFeatures ? product.shortFeatures.replace(/;/g, ' • ') : product.description}
         </p>
         
-        <div className="mt-auto flex items-center justify-between pt-2">
+        <div className="mt-auto flex items-end justify-between pt-2 gap-2">
           <div className="flex flex-col">
-            <span className="text-xs font-bold text-brand-400 line-through">
+            <span className="text-[10px] md:text-xs font-bold text-brand-400 line-through">
               {formatPrice(product.originalPrice || Math.ceil((product.price * 1.8) / 10000) * 10000)}
             </span>
             <div className="flex items-baseline gap-1">
-              <span className="text-xl font-black text-tiktok-magenta">{formatPrice(product.price)}</span>
+              <span className="text-lg md:text-xl font-black text-tiktok-magenta leading-none">{formatPrice(product.price)}</span>
               {product.priceUnit && (
-                <span className="text-[10px] font-bold text-brand-400 uppercase">/ {product.priceUnit}</span>
+                <span className="text-[9px] md:text-[10px] font-bold text-brand-400 uppercase">/ {product.priceUnit}</span>
               )}
             </div>
           </div>
@@ -136,17 +136,17 @@ export default function ProductCard({ product, onAddToCart, onView }: ProductCar
             onClick={() => product.stock > 0 && onAddToCart(product)}
             disabled={product.stock <= 0}
             animate={product.stock > 0 ? {
-              scale: [1, 1.1, 1],
+              scale: [1, 1.05, 1],
             } : {}}
             transition={product.stock > 0 ? {
               duration: 2,
               repeat: Infinity,
               ease: "easeInOut"
             } : {}}
-            whileHover={{ scale: 1.15 }}
+            whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            className={`flex h-10 w-10 items-center justify-center rounded-full text-white ${product.stock > 0 ? 'bg-tiktok-black cursor-pointer' : 'bg-brand-200 cursor-not-allowed'}`}
-            style={product.stock > 0 ? { boxShadow: '2px 2px 0px #00F2EA' } : {}}
+            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white ${product.stock > 0 ? 'bg-tiktok-black cursor-pointer' : 'bg-brand-200 cursor-not-allowed'}`}
+            style={product.stock > 0 ? { boxShadow: '3px 3px 0px #00F2EA' } : {}}
           >
             <ShoppingCart className="h-5 w-5" />
           </motion.button>
