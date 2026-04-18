@@ -217,8 +217,8 @@ export default function App() {
                 <p className="max-w-2xl text-brand-500 font-medium px-4">Khám phá danh mục các dịch vụ số cao cấp được tin dùng nhất hiện nay.</p>
                 
                 <div className="mt-6 lg:mt-12 w-full max-w-full overflow-hidden">
-                  <div className="flex w-full items-center gap-2 overflow-x-auto pb-4 no-scrollbar lg:justify-center lg:flex-wrap lg:overflow-visible lg:pb-0">
-                    <div className="flex gap-2 lg:gap-3 px-4 lg:px-0">
+                  <div className="flex w-full items-center gap-2 overflow-x-auto pb-4 no-scrollbar lg:justify-center lg:pb-0">
+                    <div className="flex shrink-0 items-center gap-2 lg:gap-3 px-4 lg:px-0">
                     {categories.map((category) => {
                       const Icon = categoryIcons[category] || Package;
                       const isActive = selectedCategory === category;
@@ -240,26 +240,26 @@ export default function App() {
                     })}
                   </div>
 
-                    <div className="hidden lg:block h-6 w-px bg-brand-100 mx-2" />
-                    
-                    <div className="pr-4 lg:pr-0">
-                      <button
-                        onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-                        className={`flex shrink-0 items-center gap-2 rounded-xl lg:rounded-2xl border-2 px-4 py-2 lg:px-6 lg:py-3 text-[11px] lg:text-sm font-bold transition-all ${
-                          isFiltersOpen || priceRange[1] !== null || minRating > 0
-                            ? 'border-tiktok-cyan bg-tiktok-cyan/5 text-tiktok-black'
-                            : 'border-brand-100 bg-white text-brand-500 hover:border-brand-200 hover:shadow-sm'
-                        }`}
-                      >
-                        <Filter className={`h-3.5 w-3.5 lg:h-4 lg:w-4 ${isFiltersOpen ? 'text-tiktok-cyan' : 'text-brand-300'}`} /> 
-                        <span className="whitespace-nowrap">Bộ lọc</span>
-                        {(priceRange[1] !== null || minRating > 0) && (
-                          <span className="flex h-4 w-4 items-center justify-center rounded-full bg-tiktok-magenta text-[10px] text-white">
-                            !
-                          </span>
-                        )}
-                      </button>
-                    </div>
+                      <div className="hidden lg:block h-6 w-px bg-brand-100 mx-3" />
+                      
+                      <div className="pr-4 lg:pr-0">
+                        <button
+                          onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+                          className={`flex shrink-0 items-center gap-2 rounded-xl lg:rounded-2xl border px-4 py-2 lg:px-5 lg:py-3 text-[11px] lg:text-sm font-bold transition-all ${
+                            isFiltersOpen || priceRange[1] !== null || minRating > 0
+                              ? 'border-tiktok-cyan bg-tiktok-cyan/5 text-tiktok-black'
+                              : 'border-brand-100 bg-white text-brand-500 hover:border-brand-200 hover:shadow-sm'
+                          }`}
+                        >
+                          <Filter className={`h-3.5 w-3.5 lg:h-4 lg:w-4 ${isFiltersOpen ? 'text-tiktok-cyan' : 'text-brand-300'}`} /> 
+                          <span className="whitespace-nowrap">Bộ lọc</span>
+                          {(priceRange[1] !== null || minRating > 0) && (
+                            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-tiktok-magenta text-[10px] text-white">
+                              !
+                            </span>
+                          )}
+                        </button>
+                      </div>
                   </div>
                 </div>
               </div>
