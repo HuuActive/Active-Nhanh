@@ -212,51 +212,55 @@ export default function App() {
           {/* Products Section */}
           <section id="products" className="py-16 lg:py-24">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <div className="mb-12 flex flex-col items-center text-center gap-4">
+              <div className="mb-8 lg:mb-12 flex flex-col items-center text-center gap-4">
                 <h2 className="font-sans text-4xl font-black tracking-tight text-tiktok-black sm:text-5xl">Sản phẩm nổi bật</h2>
-                <p className="max-w-2xl text-brand-500 font-medium">Khám phá danh mục các dịch vụ số cao cấp được tin dùng nhất hiện nay.</p>
+                <p className="max-w-2xl text-brand-500 font-medium px-4">Khám phá danh mục các dịch vụ số cao cấp được tin dùng nhất hiện nay.</p>
                 
-                <div className="mt-12 flex flex-wrap justify-center gap-3 items-center">
-                  <div className="flex flex-wrap justify-center gap-3">
+                <div className="mt-6 lg:mt-12 w-full max-w-full overflow-hidden">
+                  <div className="flex w-full items-center gap-2 overflow-x-auto pb-4 no-scrollbar lg:justify-center lg:flex-wrap lg:overflow-visible lg:pb-0">
+                    <div className="flex gap-2 lg:gap-3 px-4 lg:px-0">
                     {categories.map((category) => {
                       const Icon = categoryIcons[category] || Package;
                       const isActive = selectedCategory === category;
                       
                       return (
-                        <button
-                          key={category}
-                          onClick={() => setSelectedCategory(category)}
-                          className={`group flex items-center gap-2.5 rounded-2xl px-5 py-3 text-sm font-bold transition-all duration-300 ${
-                            isActive
-                              ? 'bg-tiktok-black text-white shadow-xl scale-105 z-10'
-                              : 'bg-brand-50/50 border border-transparent text-brand-500 hover:bg-white hover:border-brand-200 hover:text-tiktok-black hover:shadow-sm'
-                          }`}
-                        >
-                          <Icon className={`h-4 w-4 transition-transform duration-300 ${isActive ? 'text-tiktok-cyan scale-110' : 'text-brand-300 group-hover:text-tiktok-cyan group-hover:scale-110'}`} />
-                          {category === 'All' ? 'Tất cả' : category}
-                        </button>
+                          <button
+                            key={category}
+                            onClick={() => setSelectedCategory(category)}
+                            className={`group flex shrink-0 items-center gap-2 rounded-xl lg:rounded-2xl px-3.5 py-2 lg:px-5 lg:py-3 text-[11px] lg:text-sm font-bold transition-all duration-300 ${
+                              isActive
+                                ? 'bg-tiktok-black text-white shadow-lg lg:shadow-xl scale-105 z-10'
+                                : 'bg-brand-50/80 border border-transparent text-brand-500 hover:bg-white hover:border-brand-200 hover:text-tiktok-black hover:shadow-sm'
+                            }`}
+                          >
+                            <Icon className={`h-3.5 w-3.5 lg:h-4 lg:w-4 transition-transform duration-300 ${isActive ? 'text-tiktok-cyan' : 'text-brand-300 group-hover:text-tiktok-cyan'}`} />
+                            {category === 'All' ? 'Tất cả' : category}
+                          </button>
                       );
                     })}
                   </div>
-                  
-                  <div className="hidden sm:block h-8 w-px bg-brand-100 mx-2" />
-                  
-                  <button
-                    onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-                    className={`flex items-center gap-2.5 rounded-2xl border-2 px-6 py-3 text-sm font-bold transition-all ${
-                      isFiltersOpen || priceRange[1] !== null || minRating > 0
-                        ? 'border-tiktok-cyan bg-tiktok-cyan/5 text-tiktok-black'
-                        : 'border-brand-100 bg-white text-brand-500 hover:border-brand-200 hover:shadow-sm'
-                    }`}
-                  >
-                    <Filter className={`h-4 w-4 ${isFiltersOpen ? 'text-tiktok-cyan' : 'text-brand-300'}`} /> 
-                    Bộ lọc 
-                    {(priceRange[1] !== null || minRating > 0) && (
-                      <span className="flex h-4 w-4 items-center justify-center rounded-full bg-tiktok-magenta text-[10px] text-white">
-                        {(priceRange[1] !== null ? 1 : 0) + (minRating > 0 ? 1 : 0)}
-                      </span>
-                    )}
-                  </button>
+
+                    <div className="hidden lg:block h-6 w-px bg-brand-100 mx-2" />
+                    
+                    <div className="pr-4 lg:pr-0">
+                      <button
+                        onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+                        className={`flex shrink-0 items-center gap-2 rounded-xl lg:rounded-2xl border-2 px-4 py-2 lg:px-6 lg:py-3 text-[11px] lg:text-sm font-bold transition-all ${
+                          isFiltersOpen || priceRange[1] !== null || minRating > 0
+                            ? 'border-tiktok-cyan bg-tiktok-cyan/5 text-tiktok-black'
+                            : 'border-brand-100 bg-white text-brand-500 hover:border-brand-200 hover:shadow-sm'
+                        }`}
+                      >
+                        <Filter className={`h-3.5 w-3.5 lg:h-4 lg:w-4 ${isFiltersOpen ? 'text-tiktok-cyan' : 'text-brand-300'}`} /> 
+                        <span className="whitespace-nowrap">Bộ lọc</span>
+                        {(priceRange[1] !== null || minRating > 0) && (
+                          <span className="flex h-4 w-4 items-center justify-center rounded-full bg-tiktok-magenta text-[10px] text-white">
+                            !
+                          </span>
+                        )}
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
 
