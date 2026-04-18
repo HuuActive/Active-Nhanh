@@ -26,7 +26,8 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendEmailVerification,
-  updateProfile
+  updateProfile,
+  sendPasswordResetEmail
 } from 'firebase/auth';
 import { db, auth, handleFirestoreError, OperationType } from '../lib/firebase';
 import { Product, Category } from '../types';
@@ -189,6 +190,15 @@ export function useAuth() {
     }
   };
 
+  const resetPassword = async (email: string) => {
+    try {
+      await sendPasswordResetEmail(auth, email);
+    } catch (error) {
+      console.error('Reset password error:', error);
+      throw error;
+    }
+  };
+
   return { 
     user, 
     isAdmin, 
@@ -198,7 +208,8 @@ export function useAuth() {
     registerWithEmail,
     loginWithEmail,
     logout,
-    resendVerification
+    resendVerification,
+    resetPassword
   };
 }
 

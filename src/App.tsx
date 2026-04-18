@@ -5,7 +5,11 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Zap, ShieldCheck, BadgeDollarSign, ChevronDown, Loader2, Star, CheckCircle2, Users, Headphones, ArrowRight, Filter } from 'lucide-react';
+import { 
+  Zap, ShieldCheck, BadgeDollarSign, ChevronDown, Loader2, Star, CheckCircle2, 
+  Users, Headphones, ArrowRight, Filter, LayoutGrid, Gamepad2, Briefcase, 
+  GraduationCap, Camera, Monitor, Cloud, Cpu, Gift, Package 
+} from 'lucide-react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import ProductCard from './components/ProductCard';
@@ -22,6 +26,7 @@ import DMCAModal from './components/DMCAModal';
 import WarrantyModal from './components/WarrantyModal';
 import PaymentGuideModal from './components/PaymentGuideModal';
 import GuideModal from './components/GuideModal';
+import LoginModal from './components/LoginModal';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { useProducts, useAuth, useCategories, useReviews } from './hooks/useFirebase';
 import { useRecentlyViewed } from './hooks/useRecentlyViewed';
@@ -64,6 +69,18 @@ const stats = [
   { icon: Star, label: 'Hài lòng', value: '99%' }
 ];
 
+const categoryIcons: Record<string, any> = {
+  'All': LayoutGrid,
+  'Giải trí': Gamepad2,
+  'Làm việc': Briefcase,
+  'Học tập': GraduationCap,
+  'Edit Ảnh - Video': Camera,
+  'Windows, Office': Monitor,
+  'Google Drive': Cloud,
+  'Vũ trụ AI': Cpu,
+  'Quà tặng': Gift,
+};
+
 export default function App() {
   const { products, loading: productsLoading } = useProducts();
   const { categories: dbCategories } = useCategories();
@@ -80,6 +97,7 @@ export default function App() {
   const [isWarrantyOpen, setIsWarrantyOpen] = useState(false);
   const [isPaymentGuideOpen, setIsPaymentGuideOpen] = useState(false);
   const [isGuideOpen, setIsGuideOpen] = useState(false);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -183,6 +201,7 @@ export default function App() {
           onMyOrdersClick={() => setIsMyOrdersOpen(true)}
           onContactClick={() => setIsContactOpen(true)}
           onGuideClick={() => setIsGuideOpen(true)}
+          onLoginClick={() => setIsLoginOpen(true)}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
         />
@@ -197,32 +216,40 @@ export default function App() {
                 <h2 className="font-sans text-4xl font-black tracking-tight text-tiktok-black sm:text-5xl">Sản phẩm nổi bật</h2>
                 <p className="max-w-2xl text-brand-500 font-medium">Khám phá danh mục các dịch vụ số cao cấp được tin dùng nhất hiện nay.</p>
                 
-                <div className="mt-8 flex flex-wrap justify-center gap-2 items-center">
-                  <div className="flex flex-wrap justify-center gap-2 rounded-full bg-brand-50 p-1">
-                    {categories.map((category) => (
-                      <button
-                        key={category}
-                        onClick={() => setSelectedCategory(category)}
-                        className={`rounded-full px-6 py-2 text-xs font-bold transition-all ${
-                          selectedCategory === category
-                            ? 'bg-tiktok-black text-white shadow-lg'
-                            : 'text-brand-500 hover:text-tiktok-black'
-                        }`}
-                      >
-                        {category === 'All' ? 'Tất cả' : category}
-                      </button>
-                    ))}
+                <div className="mt-12 flex flex-wrap justify-center gap-3 items-center">
+                  <div className="flex flex-wrap justify-center gap-3">
+                    {categories.map((category) => {
+                      const Icon = categoryIcons[category] || Package;
+                      const isActive = selectedCategory === category;
+                      
+                      return (
+                        <button
+                          key={category}
+                          onClick={() => setSelectedCategory(category)}
+                          className={`group flex items-center gap-2.5 rounded-2xl px-5 py-3 text-sm font-bold transition-all duration-300 ${
+                            isActive
+                              ? 'bg-tiktok-black text-white shadow-xl scale-105 z-10'
+                              : 'bg-brand-50/50 border border-transparent text-brand-500 hover:bg-white hover:border-brand-200 hover:text-tiktok-black hover:shadow-sm'
+                          }`}
+                        >
+                          <Icon className={`h-4 w-4 transition-transform duration-300 ${isActive ? 'text-tiktok-cyan scale-110' : 'text-brand-300 group-hover:text-tiktok-cyan group-hover:scale-110'}`} />
+                          {category === 'All' ? 'Tất cả' : category}
+                        </button>
+                      );
+                    })}
                   </div>
+                  
+                  <div className="hidden sm:block h-8 w-px bg-brand-100 mx-2" />
                   
                   <button
                     onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-                    className={`flex items-center gap-2 rounded-full border-2 px-6 py-2 text-xs font-bold transition-all ${
+                    className={`flex items-center gap-2.5 rounded-2xl border-2 px-6 py-3 text-sm font-bold transition-all ${
                       isFiltersOpen || priceRange[1] !== null || minRating > 0
                         ? 'border-tiktok-cyan bg-tiktok-cyan/5 text-tiktok-black'
-                        : 'border-brand-100 bg-white text-brand-500 hover:border-brand-200'
+                        : 'border-brand-100 bg-white text-brand-500 hover:border-brand-200 hover:shadow-sm'
                     }`}
                   >
-                    <Filter className="h-4 w-4" /> 
+                    <Filter className={`h-4 w-4 ${isFiltersOpen ? 'text-tiktok-cyan' : 'text-brand-300'}`} /> 
                     Bộ lọc 
                     {(priceRange[1] !== null || minRating > 0) && (
                       <span className="flex h-4 w-4 items-center justify-center rounded-full bg-tiktok-magenta text-[10px] text-white">
@@ -253,7 +280,7 @@ export default function App() {
               ) : (
                 <motion.div 
                   layout
-                  className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4"
+                  className="grid grid-cols-2 gap-3 md:gap-8 sm:grid-cols-2 lg:grid-cols-4"
                 >
                   <AnimatePresence mode="popLayout">
                     {filteredProducts.length > 0 ? (
@@ -573,6 +600,11 @@ export default function App() {
         <GuideModal
           isOpen={isGuideOpen}
           onClose={() => setIsGuideOpen(false)}
+        />
+
+        <LoginModal
+          isOpen={isLoginOpen}
+          onClose={() => setIsLoginOpen(false)}
         />
 
         <ProductDetail
