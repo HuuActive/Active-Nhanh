@@ -63,13 +63,12 @@ export default function Header({
                 <div className="absolute -right-0.5 -top-0.5 h-full w-full rounded-lg border border-tiktok-cyan opacity-50"></div>
                 <div className="absolute -bottom-0.5 -left-0.5 h-full w-full rounded-lg border border-tiktok-magenta opacity-50"></div>
               </div>
-              <span className="font-sans text-lg sm:text-xl font-extrabold tracking-tighter text-tiktok-black">
+              <span className="font-sans text-base sm:text-xl font-extrabold tracking-tighter text-tiktok-black">
                 Active<span className="text-tiktok-magenta">Nhanh</span>
               </span>
             </a>
           </div>
 
-          {/* Desktop Nav */}
           <nav className="hidden lg:flex lg:gap-8">
             {['Sản phẩm', 'Bảng giá', 'Hướng dẫn', 'Liên hệ'].map((item) => (
               <button
@@ -79,7 +78,7 @@ export default function Header({
                   else if (item === 'Hướng dẫn') onGuideClick();
                   else if (item === 'Sản phẩm') window.scrollTo({ top: 800, behavior: 'smooth' });
                 }}
-                className="text-sm font-semibold text-brand-600 transition-all hover:text-tiktok-black hover:underline decoration-tiktok-cyan decoration-2 underline-offset-4"
+                className="text-[13px] lg:text-sm font-semibold text-brand-600 transition-all hover:text-tiktok-black hover:underline decoration-tiktok-cyan decoration-2 underline-offset-4"
               >
                 {item}
               </button>
@@ -216,28 +215,28 @@ export default function Header({
               <div className="p-6 border-b border-brand-50 bg-tiktok-black text-white">
                 <div className="mb-6 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Zap className="h-6 w-6 text-tiktok-cyan" />
-                    <span className="text-xl font-black italic uppercase">Menu</span>
+                    <Zap className="h-5 w-5 text-tiktok-cyan" />
+                    <span className="text-[15px] font-black italic uppercase">Menu</span>
                   </div>
-                  <button onClick={() => setIsMobileMenuOpen(false)} className="rounded-full bg-white/10 p-2 text-white hover:bg-white/20">
-                    <X className="h-5 w-5" />
+                  <button onClick={() => setIsMobileMenuOpen(false)} className="rounded-full bg-white/10 p-1.5 text-white hover:bg-white/20">
+                    <X className="h-4 w-4" />
                   </button>
                 </div>
                 
                 {user ? (
                   <div className="flex items-center gap-3">
-                    <img src={user.photoURL || ''} alt="" className="h-12 w-12 rounded-full border-2 border-tiktok-cyan" />
+                    <img src={user.photoURL || ''} alt="" className="h-10 w-10 rounded-full border-2 border-tiktok-cyan" />
                     <div className="min-w-0">
-                      <p className="font-black truncate text-sm">{user.displayName}</p>
-                      <p className="text-[10px] font-bold text-brand-400 truncate opacity-70 uppercase tracking-widest">{isAdmin ? 'Quản trị viên' : 'Thành viên'}</p>
+                      <p className="font-black truncate text-[13px]">{user.displayName}</p>
+                      <p className="text-[9px] font-bold text-brand-400 truncate opacity-70 uppercase tracking-widest">{isAdmin ? 'Quản trị viên' : 'Thành viên'}</p>
                     </div>
                   </div>
                 ) : (
-                  <div className="bg-white/5 rounded-2xl p-4 border border-white/10">
-                    <p className="text-xs text-white/60 mb-3 font-medium">Đăng nhập để xem đơn hàng và ưu đãi dành riêng cho bạn.</p>
+                  <div className="bg-white/5 rounded-2xl p-3 border border-white/10">
+                    <p className="text-[11px] text-white/60 mb-2 font-medium">Đăng nhập để xem đơn hàng và ưu đãi dành riêng cho bạn.</p>
                     <button 
                       onClick={() => { setIsMobileMenuOpen(false); onLoginClick(); }}
-                      className="flex w-full items-center justify-center gap-2 rounded-xl bg-tiktok-cyan py-3 text-sm font-black text-tiktok-black transition-transform active:scale-95 shadow-[0_4px_0_#00c2bb]"
+                      className="flex w-full items-center justify-center gap-2 rounded-xl bg-tiktok-cyan py-2.5 text-[13px] font-black text-tiktok-black transition-transform active:scale-95 shadow-[0_3px_0_#00c2bb]"
                     >
                       <User className="h-4 w-4" /> Đăng nhập / Đăng ký
                     </button>
@@ -245,8 +244,8 @@ export default function Header({
                 )}
               </div>
 
-              <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-1 sm-scrollbar">
-                <div className="text-[10px] font-black tracking-widest text-brand-400 mt-2 mb-2 px-2 uppercase">Điều hướng chính</div>
+              <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-0.5 sm-scrollbar">
+                <div className="text-[9px] font-black tracking-widest text-brand-400 mt-2 mb-1 px-2 uppercase">Điều hướng chính</div>
                 {[
                   { name: 'Sản phẩm', icon: Package, action: () => {
                     const productsSection = document.getElementById('products');
@@ -261,48 +260,48 @@ export default function Header({
                       setIsMobileMenuOpen(false);
                       item.action();
                     }}
-                    className="flex items-center gap-4 rounded-xl px-4 py-3.5 text-left font-bold text-tiktok-black transition-colors hover:bg-brand-50"
+                    className="flex items-center gap-4 rounded-xl px-4 py-2.5 text-left font-bold text-tiktok-black transition-colors hover:bg-brand-50 text-[13px]"
                   >
-                    <item.icon className="h-5 w-5 text-brand-300" />
+                    <item.icon className="h-4 w-4 text-brand-300" />
                     {item.name}
                   </button>
                 ))}
 
-                <div className="my-3 border-t border-brand-50" />
-                <div className="text-[10px] font-black tracking-widest text-brand-400 mb-2 px-2 uppercase">Tài khoản & Dịch vụ</div>
+                <div className="my-2 border-t border-brand-50" />
+                <div className="text-[9px] font-black tracking-widest text-brand-400 mb-1 px-2 uppercase">Tài khoản & Dịch vụ</div>
                 
                 {user && (
                   <>
                     <button 
                       onClick={() => { setIsMobileMenuOpen(false); onMyOrdersClick(); }}
-                      className="flex items-center gap-4 rounded-xl px-4 py-3.5 text-left font-bold text-tiktok-black transition-colors hover:bg-brand-50"
+                      className="flex items-center gap-4 rounded-xl px-4 py-2.5 text-left font-bold text-tiktok-black transition-colors hover:bg-brand-50 text-[13px]"
                     >
-                      <ShoppingCart className="h-5 w-5 text-brand-300" /> Đơn hàng của tôi
+                      <ShoppingCart className="h-4 w-4 text-brand-300" /> Đơn hàng của tôi
                     </button>
                     
                     {isAdmin && (
                       <button 
                         onClick={() => { setIsMobileMenuOpen(false); onAdminClick(); }}
-                        className="flex items-center gap-4 rounded-xl px-4 py-3.5 text-left font-bold text-tiktok-cyan transition-colors hover:bg-brand-50"
+                        className="flex items-center gap-4 rounded-xl px-4 py-2.5 text-left font-bold text-tiktok-cyan transition-colors hover:bg-brand-50 text-[13px]"
                       >
-                        <Shield className="h-5 w-5" /> Quản trị hệ thống
+                        <Shield className="h-4 w-4" /> Quản trị hệ thống
                       </button>
                     )}
                     
                     <button 
                       onClick={() => { setIsMobileMenuOpen(false); logout(); }}
-                      className="mt-2 flex items-center gap-4 rounded-xl px-4 py-3.5 text-left font-bold text-tiktok-magenta transition-colors hover:bg-red-50"
+                      className="mt-1 flex items-center gap-4 rounded-xl px-4 py-2.5 text-left font-bold text-tiktok-magenta transition-colors hover:bg-red-50 text-[13px]"
                     >
-                      <LogOut className="h-5 w-5" /> Đăng xuất
+                      <LogOut className="h-4 w-4" /> Đăng xuất
                     </button>
                   </>
                 )}
               </div>
               
-              <div className="p-6 bg-brand-50/50">
-                 <div className="rounded-2xl bg-white border border-brand-100 p-4 shadow-sm">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-brand-400">Liên hệ hỗ trợ</p>
-                    <p className="mt-1 font-black text-tiktok-black text-lg">07 789 57 345</p>
+              <div className="p-4 bg-brand-50/50">
+                 <div className="rounded-2xl bg-white border border-brand-100 p-3 shadow-sm">
+                    <p className="text-[9px] font-black uppercase tracking-widest text-brand-400">Liên hệ hỗ trợ</p>
+                    <p className="mt-0.5 font-black text-tiktok-black text-[15px]">07 789 57 345</p>
                     <div className="mt-3 flex gap-2">
                       <div className="h-1 w-full rounded-full bg-tiktok-cyan opacity-40" />
                       <div className="h-1 w-full rounded-full bg-tiktok-magenta opacity-40" />

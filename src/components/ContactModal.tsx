@@ -34,40 +34,40 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
 
             <div className="grid grid-cols-1 md:grid-cols-2">
               {/* Left: Info */}
-              <div className="bg-tiktok-black p-8 lg:p-12 text-white">
-                <h2 className="mb-8 text-3xl font-black tracking-tight">Liên hệ với chúng tôi</h2>
-                <p className="mb-12 text-brand-300">
+              <div className="bg-tiktok-black p-6 lg:p-12 text-white">
+                <h2 className="mb-6 lg:mb-8 text-[20px] lg:text-3xl font-black tracking-tight">Liên hệ với chúng tôi</h2>
+                <p className="mb-8 lg:mb-12 text-[13px] lg:text-base text-brand-300">
                   Anh cần hỗ trợ kỹ thuật hay tư vấn dịch vụ? Đội ngũ ActiveNhanh luôn sẵn sàng phục vụ 24/7.
                 </p>
 
-                <div className="space-y-8">
+                <div className="space-y-6 lg:space-y-8">
                   <div className="flex items-start gap-4">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-tiktok-cyan">
-                      <Phone className="h-5 w-5" />
+                    <div className="flex h-8 w-8 lg:h-10 lg:w-10 items-center justify-center rounded-xl bg-white/10 text-tiktok-cyan">
+                      <Phone className="h-4 w-4 lg:h-5 lg:w-5" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold uppercase tracking-widest text-brand-400">Hotline / Zalo</p>
-                      <p className="text-lg font-black">07 789 57 345</p>
+                      <p className="text-[10px] lg:text-xs font-bold uppercase tracking-widest text-brand-400">Hotline / Zalo</p>
+                      <p className="text-[15px] lg:text-lg font-black">07 789 57 345</p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-4">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-tiktok-magenta">
-                      <Mail className="h-5 w-5" />
+                    <div className="flex h-8 w-8 lg:h-10 lg:w-10 items-center justify-center rounded-xl bg-white/10 text-tiktok-magenta">
+                      <Mail className="h-4 w-4 lg:h-5 lg:w-5" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold uppercase tracking-widest text-brand-400">Email</p>
-                      <p className="text-lg font-black">activenhanh@gmail.com</p>
+                      <p className="text-[10px] lg:text-xs font-bold uppercase tracking-widest text-brand-400">Email</p>
+                      <p className="text-[15px] lg:text-lg font-black">activenhanh@gmail.com</p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-4">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-tiktok-cyan">
-                      <Clock className="h-5 w-5" />
+                    <div className="flex h-8 w-8 lg:h-10 lg:w-10 items-center justify-center rounded-xl bg-white/10 text-tiktok-cyan">
+                      <Clock className="h-4 w-4 lg:h-5 lg:w-5" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold uppercase tracking-widest text-brand-400">Giờ làm việc</p>
-                      <p className="text-lg font-black">08:00 - 23:00 (Hàng ngày)</p>
+                      <p className="text-[10px] lg:text-xs font-bold uppercase tracking-widest text-brand-400">Giờ làm việc</p>
+                      <p className="text-[15px] lg:text-lg font-black">08:00 - 23:00 (Hàng ngày)</p>
                     </div>
                   </div>
                 </div>

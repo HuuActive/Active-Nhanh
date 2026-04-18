@@ -128,14 +128,14 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, total }: Che
                   <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-green-100">
                     <CheckCircle2 className="h-12 w-12 text-green-500" />
                   </div>
-                  <h2 className="mb-4 text-3xl font-black text-tiktok-black">Đặt hàng thành công!</h2>
-                  <p className="mb-8 max-w-md text-brand-500">
+                  <h2 className="mb-4 text-[18px] lg:text-3xl font-black text-tiktok-black">Đặt hàng thành công!</h2>
+                  <p className="mb-8 max-w-md text-[13px] lg:text-base text-brand-500">
                     Cảm ơn anh đã tin tưởng ActiveNhanh. Đơn hàng của anh đang được xử lý. 
                     Thông tin tài khoản sẽ được gửi qua Email/Zalo trong vòng 5-15 phút.
                   </p>
                   <button
                     onClick={onClose}
-                    className="rounded-2xl bg-tiktok-black px-10 py-4 font-black text-white transition-all hover:scale-105"
+                    className="rounded-2xl bg-tiktok-black px-8 py-3 lg:px-10 lg:py-4 text-[13px] lg:text-base font-black text-white transition-all hover:scale-105"
                   >
                     Quay lại trang chủ
                   </button>
@@ -144,15 +144,15 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, total }: Che
                 <div className="grid grid-cols-1 lg:grid-cols-3">
                   {/* Left: Form */}
                   <div className="lg:col-span-2 p-6 lg:p-10">
-                    <div className="mb-8 flex items-center gap-4">
-                      <div className={`flex h-10 w-10 items-center justify-center rounded-full font-bold ${step === 'info' ? 'bg-tiktok-black text-white' : 'bg-green-500 text-white'}`}>
-                        {step === 'info' ? '1' : <CheckCircle2 className="h-6 w-6" />}
+                    <div className="mb-8 flex items-center gap-2 lg:gap-4">
+                      <div className={`flex h-8 w-8 lg:h-10 lg:w-10 items-center justify-center rounded-full font-bold text-[13px] lg:text-base ${step === 'info' ? 'bg-tiktok-black text-white' : 'bg-green-500 text-white'}`}>
+                        {step === 'info' ? '1' : <CheckCircle2 className="h-4 w-4 lg:h-6 lg:w-6" />}
                       </div>
-                      <div className="h-px w-12 bg-brand-100" />
-                      <div className={`flex h-10 w-10 items-center justify-center rounded-full font-bold ${step === 'payment' ? 'bg-tiktok-black text-white' : 'bg-brand-100 text-brand-400'}`}>
+                      <div className="h-px w-6 lg:w-12 bg-brand-100" />
+                      <div className={`flex h-8 w-8 lg:h-10 lg:w-10 items-center justify-center rounded-full font-bold text-[13px] lg:text-base ${step === 'payment' ? 'bg-tiktok-black text-white' : 'bg-brand-100 text-brand-400'}`}>
                         2
                       </div>
-                      <h2 className="ml-4 text-2xl font-black text-tiktok-black">
+                      <h2 className="ml-2 lg:ml-4 text-[18px] lg:text-2xl font-black text-tiktok-black">
                         {step === 'info' ? 'Thông tin nhận hàng' : 'Thanh toán'}
                       </h2>
                     </div>
@@ -227,9 +227,9 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, total }: Che
                         </div>
                         <button
                           type="submit"
-                          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-tiktok-black py-5 text-lg font-black text-white shadow-lg transition-all hover:scale-[1.01]"
+                          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-tiktok-black py-4 lg:py-5 text-[15px] lg:text-lg font-black text-white shadow-lg transition-all hover:scale-[1.01]"
                         >
-                          Tiếp tục thanh toán <ChevronRight className="h-5 w-5" />
+                          Tiếp tục thanh toán <ChevronRight className="h-4 w-4 lg:h-5 lg:w-5" />
                         </button>
                       </form>
                     ) : (
@@ -312,16 +312,16 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, total }: Che
 
                   {/* Right: Summary */}
                   <div className="bg-brand-50/50 p-6 lg:p-10 border-l border-brand-100">
-                    <h3 className="mb-6 text-lg font-black text-tiktok-black">Đơn hàng của bạn</h3>
+                    <h3 className="mb-6 text-[15px] lg:text-lg font-black text-tiktok-black">Đơn hàng của bạn</h3>
                     <div className="mb-8 space-y-4">
                       {cartItems.map((item) => (
                         <div key={item.id} className="flex gap-4">
-                          <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl border border-brand-100 bg-white">
+                          <div className="h-14 w-14 lg:h-16 lg:w-16 flex-shrink-0 overflow-hidden rounded-xl border border-brand-100 bg-white">
                             <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
                           </div>
                           <div className="flex flex-1 flex-col justify-center">
-                            <h4 className="text-sm font-black text-tiktok-black line-clamp-1">{item.name}</h4>
-                            <div className="flex justify-between text-xs font-bold">
+                            <h4 className="text-[13px] lg:text-sm font-black text-tiktok-black line-clamp-1">{item.name}</h4>
+                            <div className="flex justify-between text-[11px] lg:text-xs font-bold">
                               <span className="text-brand-400">Số lượng: {item.quantity}</span>
                               <span className="text-tiktok-magenta">{formatPrice(item.price * item.quantity)}</span>
                             </div>
@@ -331,17 +331,17 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, total }: Che
                     </div>
 
                     <div className="space-y-3 border-t border-brand-100 pt-6">
-                      <div className="flex justify-between text-sm font-bold">
+                      <div className="flex justify-between text-[13px] lg:text-sm font-bold">
                         <span className="text-brand-400">Tạm tính</span>
                         <span className="text-tiktok-black">{formatPrice(total)}</span>
                       </div>
-                      <div className="flex justify-between text-sm font-bold">
+                      <div className="flex justify-between text-[13px] lg:text-sm font-bold">
                         <span className="text-brand-400">Phí dịch vụ</span>
                         <span className="text-green-500">Miễn phí</span>
                       </div>
                       <div className="flex justify-between pt-4">
-                        <span className="text-lg font-black text-tiktok-black">Tổng cộng</span>
-                        <span className="text-2xl font-black text-tiktok-magenta">{formatPrice(total)}</span>
+                        <span className="text-[15px] lg:text-lg font-black text-tiktok-black">Tổng cộng</span>
+                        <span className="text-[20px] lg:text-2xl font-black text-tiktok-magenta">{formatPrice(total)}</span>
                       </div>
                     </div>
 

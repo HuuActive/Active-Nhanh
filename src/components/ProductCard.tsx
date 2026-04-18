@@ -99,56 +99,67 @@ export default function ProductCard({ product, onAddToCart, onView }: ProductCar
       </div>
 
       <div className="flex flex-1 flex-col pt-3 md:pt-4">
-        <div className="mb-1 flex items-start gap-2 justify-between">
+        <div className="mb-1 flex items-start gap-1 justify-between">
           <h3 
-            className="font-sans text-base md:text-lg font-extrabold tracking-tight text-tiktok-black line-clamp-2 md:line-clamp-1 cursor-pointer hover:text-tiktok-cyan transition-colors"
+            className="font-sans text-[13px] md:text-lg font-extrabold tracking-tight text-tiktok-black line-clamp-2 md:line-clamp-1 cursor-pointer hover:text-tiktok-cyan transition-colors"
             onClick={handleView}
           >
             {product.name}
           </h3>
-          <div className="flex items-center gap-1 shrink-0 pt-1">
-            <Star className="h-3 w-3 fill-tiktok-cyan text-tiktok-cyan" />
-            <span className="text-xs font-bold text-tiktok-black">{product.rating}</span>
+          <div className="flex items-center gap-0.5 shrink-0 pt-0.5">
+            <Star className="h-2 w-2 md:h-3 md:w-3 fill-tiktok-cyan text-tiktok-cyan" />
+            <span className="text-[10px] md:text-xs font-bold text-tiktok-black">{product.rating}</span>
           </div>
         </div>
-        <div className="mb-2 flex items-center gap-2">
-          <span className={`text-[9px] md:text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${product.stock > 0 ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+        <div className="mb-1 flex items-center gap-2">
+          <span className={`text-[8px] md:text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-full ${product.stock > 0 ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
             {product.stock > 0 ? 'Sẵn sàng' : 'Hết hàng'}
           </span>
         </div>
-        <p className="mb-3 md:mb-4 line-clamp-2 text-xs md:text-sm font-medium text-brand-500">
+        <p className="mb-2 md:mb-4 line-clamp-2 text-[12px] md:text-sm font-medium text-brand-500 italic">
           {product.shortFeatures ? product.shortFeatures.replace(/;/g, ' • ') : product.description}
         </p>
         
-        <div className="mt-auto flex items-end justify-between pt-2 gap-2">
-          <div className="flex flex-col">
-            <span className="text-[10px] md:text-xs font-bold text-brand-400 line-through">
-              {formatPrice(product.originalPrice || Math.ceil((product.price * 1.8) / 10000) * 10000)}
-            </span>
-            <div className="flex items-baseline gap-1">
-              <span className="text-lg md:text-xl font-black text-tiktok-magenta leading-none">{formatPrice(product.price)}</span>
-              {product.priceUnit && (
-                <span className="text-[9px] md:text-[10px] font-bold text-brand-400 uppercase">/ {product.priceUnit}</span>
-              )}
+        <div className="mt-auto flex flex-col pt-1 md:pt-2">
+          <div className="flex items-end justify-between gap-1 mb-1.5 md:mb-3">
+            <div className="flex flex-col">
+              <span className="text-[9px] md:text-xs font-bold text-brand-400 line-through">
+                {formatPrice(product.originalPrice || Math.ceil((product.price * 1.8) / 10000) * 10000)}
+              </span>
+              <div className="flex items-baseline gap-0.5">
+                <span className="text-[14px] md:text-xl font-black text-tiktok-magenta leading-none">{formatPrice(product.price)}</span>
+                {product.priceUnit && (
+                  <span className="text-[8px] md:text-[10px] font-bold text-brand-400 uppercase">/ {product.priceUnit}</span>
+                )}
+              </div>
             </div>
+            
+            {/* Desktop only cart button */}
+            <motion.button
+              onClick={() => product.stock > 0 && onAddToCart(product)}
+              disabled={product.stock <= 0}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className={`hidden md:flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white ${product.stock > 0 ? 'bg-tiktok-black cursor-pointer' : 'bg-brand-200 cursor-not-allowed'}`}
+              style={product.stock > 0 ? { boxShadow: '3px 3px 0px #00F2EA' } : {}}
+            >
+              <Plus className="h-6 w-6" />
+            </motion.button>
           </div>
+
+          {/* Mobile only cart button - Small & Compact */}
           <motion.button
             onClick={() => product.stock > 0 && onAddToCart(product)}
             disabled={product.stock <= 0}
-            animate={product.stock > 0 ? {
-              scale: [1, 1.05, 1],
-            } : {}}
-            transition={product.stock > 0 ? {
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut"
-            } : {}}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white ${product.stock > 0 ? 'bg-tiktok-black cursor-pointer' : 'bg-brand-200 cursor-not-allowed'}`}
-            style={product.stock > 0 ? { boxShadow: '3px 3px 0px #00F2EA' } : {}}
+            whileTap={{ scale: 0.98 }}
+            className={`flex md:hidden w-full items-center justify-center gap-1 rounded-lg py-1.5 px-2 font-bold uppercase tracking-tight text-[11px] transition-all ${
+              product.stock > 0 
+                ? 'bg-tiktok-black text-white shadow-[2px_2px_0px_#00F2EA] active:shadow-none active:translate-x-[1px] active:translate-y-[1px]' 
+                : 'bg-brand-100 text-brand-400 cursor-not-allowed'
+            }`}
           >
-            <ShoppingCart className="h-5 w-5" />
+            <ShoppingCart className="h-3 w-3" />
+            thêm vào giỏ
           </motion.button>
         </div>
       </div>

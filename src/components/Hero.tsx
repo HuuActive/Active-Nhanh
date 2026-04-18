@@ -102,55 +102,55 @@ export default function Hero() {
             <span className="text-xs font-bold uppercase tracking-widest text-tiktok-black">SỐ 1 DỊCH VỤ PREMIUM TẠI VN</span>
           </motion.div>
 
-          <h1 className="mb-6 w-full font-sans text-3xl font-black leading-[1.2] tracking-tight text-tiktok-black sm:text-5xl lg:text-6xl xl:text-7xl">
+          <h1 className="mb-4 w-full font-sans text-[15px] font-black leading-tight tracking-tight text-tiktok-black sm:text-5xl lg:text-6xl xl:text-7xl">
             <span className="inline-block whitespace-nowrap">
               {displayText}
               <motion.span
                 animate={{ opacity: [1, 0] }}
                 transition={{ duration: 0.8, repeat: Infinity }}
-                className="inline-block w-1 h-[0.8em] bg-tiktok-cyan ml-1 align-middle"
+                className="inline-block w-0.5 h-[0.8em] bg-tiktok-cyan ml-0.5 align-middle"
               />
             </span>
             <br />
             <motion.span
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="relative inline-block mt-4 text-xl sm:text-3xl lg:text-4xl whitespace-nowrap"
+              className="relative inline-block mt-2 text-[13px] sm:text-3xl lg:text-4xl whitespace-nowrap"
             >
               <span className="relative z-10">Chuyên nghiệp – Tận tâm – Đồng hành bền vững.</span>
-              <div className="absolute -bottom-1 left-0 h-2 w-full bg-tiktok-cyan/30 -skew-x-12"></div>
+              <div className="absolute -bottom-0.5 left-0 h-1.5 w-full bg-tiktok-cyan/30 -skew-x-12"></div>
             </motion.span>
           </h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.8 }}
-            className="mb-10 max-w-2xl text-lg font-medium text-brand-500 sm:text-xl"
+            className="mb-6 max-w-2xl text-[13px] font-medium text-brand-500 sm:text-xl"
           >
             Dịch vụ hỗ trợ đăng ký & kích hoạt gói Premium chính chủ: Google, Microsoft, OpenAI, CapCut... 
             Giải pháp tiết kiệm tối ưu cho người dùng cá nhân và hộ kinh doanh.
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 1 }}
-            className="flex flex-wrap justify-center gap-4"
+            className="flex flex-wrap justify-center gap-2 lg:gap-4"
           >
             <button 
               onClick={scrollToProducts}
-              className="tiktok-button group flex items-center gap-2 px-10 py-4 text-base"
+              className="tiktok-button group flex items-center gap-1.5 px-5 py-2.5 lg:px-10 lg:py-4 text-[13px] lg:text-base"
             >
               Khám phá
-              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+              <ArrowRight className="h-3.5 w-3.5 lg:h-5 lg:w-5 transition-transform group-hover:translate-x-1" />
             </button>
             <button 
               onClick={() => window.open('https://zalo.me/0778957345', '_blank')}
-              className="flex items-center gap-2 rounded-sm border-2 border-tiktok-black bg-white px-10 py-4 text-base font-bold text-tiktok-black transition-all hover:bg-brand-50 active:scale-95"
+              className="flex items-center gap-1.5 rounded-sm border-[1.5px] border-tiktok-black bg-white px-5 py-2.5 lg:px-10 lg:py-4 text-[13px] lg:text-base font-bold text-tiktok-black transition-all hover:bg-brand-50 active:scale-95"
             >
-              <MessageCircle className="h-5 w-5 text-tiktok-cyan" />
+              <MessageCircle className="h-3.5 w-3.5 lg:h-5 lg:w-5 text-tiktok-cyan" />
               Tư vấn qua Zalo
             </button>
           </motion.div>

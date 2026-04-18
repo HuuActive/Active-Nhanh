@@ -27,13 +27,13 @@ export default function PaymentGuideModal({ isOpen, onClose }: PaymentGuideModal
             <div className="flex h-[85vh] flex-col">
               {/* Header */}
               <div className="relative flex items-center justify-between border-b border-brand-100 bg-white px-8 py-6">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-tiktok-cyan/10 text-tiktok-cyan">
-                    <CreditCard className="h-7 w-7" />
+                <div className="flex items-center gap-2 lg:gap-3">
+                  <div className="flex h-10 w-10 lg:h-12 lg:w-12 items-center justify-center rounded-2xl bg-tiktok-cyan/10 text-tiktok-cyan">
+                    <CreditCard className="h-5 w-5 lg:h-7 lg:w-7" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-black tracking-tight text-tiktok-black">HƯỚNG DẪN THANH TOÁN</h2>
-                    <p className="text-xs font-bold text-brand-400 uppercase tracking-widest">& Nhận dịch vụ ActiveNhanh</p>
+                    <h2 className="text-[18px] lg:text-xl font-black tracking-tight text-tiktok-black uppercase">THANH TOÁN</h2>
+                    <p className="text-[9px] lg:text-xs font-bold text-brand-400 uppercase tracking-widest">ActiveNhanh Service</p>
                   </div>
                 </div>
                 <button
@@ -74,22 +74,22 @@ export default function PaymentGuideModal({ isOpen, onClose }: PaymentGuideModal
                   {/* Step 3: Payment Details */}
                   <section className="space-y-4">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-tiktok-magenta text-white font-black">3</div>
-                      <h3 className="text-lg font-black text-tiktok-black">Thanh toán chuyển khoản</h3>
+                      <div className="flex h-8 w-8 lg:h-10 lg:w-10 items-center justify-center rounded-xl bg-tiktok-magenta text-white font-black text-[13px] lg:text-base">3</div>
+                      <h3 className="text-[16px] lg:text-lg font-black text-tiktok-black uppercase">Chuyển khoản</h3>
                     </div>
-                    <div className="rounded-3xl bg-tiktok-black p-8 text-white shadow-xl">
+                    <div className="rounded-3xl bg-tiktok-black p-6 lg:p-8 text-white shadow-xl">
                       <div className="mb-6 flex items-center gap-2 text-tiktok-cyan">
                         <Banknote className="h-5 w-5" />
-                        <span className="text-sm font-black uppercase tracking-wider">Thông tin tài khoản chính thức</span>
+                        <span className="text-[13px] lg:text-sm font-black uppercase tracking-wider">Tài khoản chính thức</span>
                       </div>
-                      <div className="space-y-4">
+                      <div className="space-y-4 text-[13px] lg:text-sm">
                         <div className="flex justify-between border-b border-white/10 pb-4">
                           <span className="text-brand-400">Ngân hàng</span>
                           <span className="font-black text-tiktok-cyan">Vietcombank</span>
                         </div>
                         <div className="flex justify-between border-b border-white/10 pb-4">
                           <span className="text-brand-400">Số tài khoản</span>
-                          <span className="text-xl font-black tracking-wider">1040564989</span>
+                          <span className="text-[18px] lg:text-xl font-black tracking-wider">1040564989</span>
                         </div>
                         <div className="flex justify-between border-b border-white/10 pb-4">
                           <span className="text-brand-400">Chủ tài khoản</span>
@@ -97,7 +97,7 @@ export default function PaymentGuideModal({ isOpen, onClose }: PaymentGuideModal
                         </div>
                         <div className="flex justify-between pt-2">
                           <span className="text-brand-400">Nội dung</span>
-                          <span className="font-bold text-tiktok-magenta">[Số điện thoại] hoặc [Tên dịch vụ]</span>
+                          <span className="font-bold text-tiktok-magenta text-right leading-tight">[SĐT] hoặc [Dịch vụ]</span>
                         </div>
                       </div>
                       <div className="mt-8 rounded-2xl bg-white/5 p-4 text-center text-xs text-brand-400">

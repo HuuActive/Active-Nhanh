@@ -34,19 +34,19 @@ export default function Cart({ isOpen, onClose, onContinueShopping, onCheckout, 
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col bg-white shadow-2xl"
           >
-            <div className="flex items-center justify-between border-b border-brand-100 p-6">
+            <div className="flex items-center justify-between border-b border-brand-100 p-4 lg:p-6">
               <div className="flex items-center gap-2">
                 <div className="relative">
-                  <ShoppingBag className="h-6 w-6 text-tiktok-black" />
-                  <div className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-tiktok-magenta"></div>
+                  <ShoppingBag className="h-5 w-5 lg:h-6 lg:w-6 text-tiktok-black" />
+                  <div className="absolute -right-0.5 -top-0.5 h-2 w-2 lg:h-3 lg:w-3 rounded-full bg-tiktok-magenta"></div>
                 </div>
-                <h2 className="font-sans text-xl font-black tracking-tight text-tiktok-black">Giỏ hàng của bạn</h2>
+                <h2 className="font-sans text-[15px] lg:text-xl font-black tracking-tight text-tiktok-black">Giỏ hàng của bạn</h2>
               </div>
               <button
                 onClick={onClose}
                 className="rounded-full p-2 text-brand-400 transition-colors hover:bg-brand-50 hover:text-tiktok-black"
               >
-                <X className="h-6 w-6" />
+                <X className="h-5 w-5 lg:h-6 lg:w-6" />
               </button>
             </div>
 
@@ -87,8 +87,8 @@ export default function Cart({ isOpen, onClose, onContinueShopping, onCheckout, 
                       <div className="flex flex-1 flex-col">
                         <div className="flex items-start justify-between">
                           <div>
-                            <h4 className="font-sans font-extrabold text-tiktok-black line-clamp-1">{item.name}</h4>
-                            <p className="text-[10px] font-bold uppercase tracking-wider text-tiktok-cyan">{item.category}</p>
+                            <h4 className="font-sans font-extrabold text-tiktok-black line-clamp-1 text-[13px] lg:text-sm">{item.name}</h4>
+                            <p className="text-[9px] lg:text-[10px] font-bold uppercase tracking-wider text-tiktok-cyan">{item.category}</p>
                           </div>
                           <button
                             onClick={() => onRemove(item.id)}
@@ -113,7 +113,7 @@ export default function Cart({ isOpen, onClose, onContinueShopping, onCheckout, 
                               <Plus className="h-3 w-3" />
                             </button>
                           </div>
-                          <span className="font-black text-tiktok-magenta">{formatPrice(item.price * item.quantity)}</span>
+                          <span className="font-black text-tiktok-magenta text-[14px] lg:text-base">{formatPrice(item.price * item.quantity)}</span>
                         </div>
                       </div>
                     </motion.div>
@@ -125,21 +125,21 @@ export default function Cart({ isOpen, onClose, onContinueShopping, onCheckout, 
             {items.length > 0 && (
               <div className="border-t border-brand-100 p-6 bg-brand-50/50">
                 <div className="mb-4 flex items-center justify-between">
-                  <span className="font-bold text-brand-500">Tổng cộng</span>
-                  <span className="text-2xl font-black text-tiktok-black">{formatPrice(subtotal)}</span>
+                  <span className="text-[13px] lg:text-sm font-bold text-brand-500">Tổng cộng</span>
+                  <span className="text-[18px] lg:text-2xl font-black text-tiktok-black">{formatPrice(subtotal)}</span>
                 </div>
-                <p className="mb-6 text-[10px] font-bold uppercase tracking-widest text-brand-400">Thanh toán an toàn qua chuyển khoản hoặc ví điện tử.</p>
+                <p className="mb-6 text-[9px] lg:text-[10px] font-bold uppercase tracking-widest text-brand-400">Thanh toán an toàn qua chuyển khoản hoặc ví điện tử.</p>
                 <div className="flex flex-col gap-3">
                   <button 
                     onClick={onCheckout}
-                    className="tiktok-button w-full flex items-center justify-center gap-2 py-4 text-lg"
+                    className="tiktok-button w-full flex items-center justify-center gap-2 py-3 lg:py-4 text-[13px] lg:text-lg"
                   >
-                    <CreditCard className="h-5 w-5" />
+                    <CreditCard className="h-4 w-4 lg:h-5 lg:w-5" />
                     Thanh toán ngay
                   </button>
                   <button 
                     onClick={onContinueShopping}
-                    className="w-full py-3 text-sm font-bold text-tiktok-black transition-colors hover:text-tiktok-cyan"
+                    className="w-full py-2 lg:py-3 text-[13px] lg:text-sm font-bold text-tiktok-black transition-colors hover:text-tiktok-cyan"
                   >
                     Tiếp tục mua sắm
                   </button>

@@ -33,15 +33,15 @@ export default function MyOrdersModal({ isOpen, onClose }: MyOrdersModalProps) {
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
             className="relative w-full max-w-2xl overflow-hidden rounded-3xl bg-white shadow-2xl"
           >
-            <div className="flex items-center justify-between border-b border-brand-100 p-6">
-              <h2 className="flex items-center gap-3 text-xl font-black text-tiktok-black">
-                <ShoppingBag className="h-6 w-6 text-tiktok-cyan" /> Đơn hàng của tôi
+            <div className="flex items-center justify-between border-b border-brand-100 p-4 lg:p-6">
+              <h2 className="flex items-center gap-2 lg:gap-3 text-[18px] lg:text-xl font-black text-tiktok-black">
+                <ShoppingBag className="h-5 w-5 lg:h-6 lg:w-6 text-tiktok-cyan" /> Đơn hàng của tôi
               </h2>
               <button
                 onClick={onClose}
                 className="rounded-full p-2 hover:bg-brand-50 transition-colors"
               >
-                <X className="h-6 w-6" />
+                <X className="h-5 w-5 lg:h-6 lg:w-6" />
               </button>
             </div>
 
@@ -68,8 +68,8 @@ export default function MyOrdersModal({ isOpen, onClose }: MyOrdersModalProps) {
                       <div className="mb-3 flex items-start justify-between">
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-black text-tiktok-black">#{order.id.slice(-6).toUpperCase()}</span>
-                            <span className={`rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wider ${
+                            <span className="text-[12px] lg:text-xs font-black text-tiktok-black">#{order.id.slice(-6).toUpperCase()}</span>
+                            <span className={`rounded-full px-2 py-0.5 text-[9px] lg:text-[10px] font-black uppercase tracking-wider ${
                               order.status === 'pending' ? 'bg-yellow-100 text-yellow-600' : 
                               order.status === 'completed' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
                             }`}>
@@ -77,18 +77,18 @@ export default function MyOrdersModal({ isOpen, onClose }: MyOrdersModalProps) {
                                order.status === 'completed' ? 'Hoàn tất' : 'Đã hủy'}
                             </span>
                           </div>
-                          <p className="mt-1 text-[10px] font-bold text-brand-400">
+                          <p className="mt-1 text-[9px] lg:text-[10px] font-bold text-brand-400">
                             {new Date(order.createdAt).toLocaleString('vi-VN')}
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm font-black text-tiktok-magenta">{formatPrice(order.total)}</p>
+                          <p className="text-[13px] lg:text-sm font-black text-tiktok-magenta">{formatPrice(order.total)}</p>
                         </div>
                       </div>
                       
                       <div className="space-y-2 border-t border-brand-50 pt-3">
                         {order.items.map((item: any, idx: number) => (
-                          <div key={idx} className="flex justify-between text-xs">
+                          <div key={idx} className="flex justify-between text-[11px] lg:text-xs">
                             <span className="font-bold text-brand-600">{item.name} <span className="text-brand-400">x{item.quantity}</span></span>
                             <span className="font-bold text-tiktok-black">{formatPrice(item.price * item.quantity)}</span>
                           </div>

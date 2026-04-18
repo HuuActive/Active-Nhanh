@@ -3,12 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Zap, ShieldCheck, BadgeDollarSign, ChevronDown, Loader2, Star, CheckCircle2, 
   Users, Headphones, ArrowRight, Filter, LayoutGrid, Gamepad2, Briefcase, 
-  GraduationCap, Camera, Monitor, Cloud, Cpu, Gift, Package 
+  GraduationCap, Camera, Monitor, Cloud, Cpu, Gift, Package,
+  ChevronLeft, ChevronRight
 } from 'lucide-react';
 import Header from './components/Header';
 import Hero from './components/Hero';
@@ -107,6 +108,17 @@ export default function App() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [testimonialIndex, setTestimonialIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
+  const categoryScrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollCategories = (direction: 'left' | 'right') => {
+    if (categoryScrollRef.current) {
+      const scrollAmount = window.innerWidth < 768 ? 200 : 400;
+      categoryScrollRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -210,42 +222,65 @@ export default function App() {
           <Hero />
 
           {/* Products Section */}
-          <section id="products" className="py-16 lg:py-24">
+          <section id="products" className="py-12 lg:py-24">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="mb-8 lg:mb-12 flex flex-col items-center text-center gap-4">
-                <h2 className="font-sans text-4xl font-black tracking-tight text-tiktok-black sm:text-5xl">Sản phẩm nổi bật</h2>
-                <p className="max-w-2xl text-brand-500 font-medium px-4">Khám phá danh mục các dịch vụ số cao cấp được tin dùng nhất hiện nay.</p>
+                <h2 className="font-sans text-[15px] lg:text-5xl font-black tracking-tight text-tiktok-black">Sản phẩm nổi bật</h2>
+                <p className="max-w-2xl text-[13px] lg:text-base font-medium text-brand-500 px-4">Khám phá danh mục các dịch vụ số cao cấp được tin dùng nhất hiện nay.</p>
                 
-                <div className="mt-6 lg:mt-12 w-full max-w-full overflow-hidden">
-                  <div className="flex w-full items-center gap-2 overflow-x-auto pb-4 no-scrollbar lg:justify-center lg:pb-0">
-                    <div className="flex shrink-0 items-center gap-2 lg:gap-3 px-4 lg:px-0">
-                    {categories.map((category) => {
-                      const Icon = categoryIcons[category] || Package;
-                      const isActive = selectedCategory === category;
-                      
-                      return (
-                          <button
-                            key={category}
-                            onClick={() => setSelectedCategory(category)}
-                            className={`group flex shrink-0 items-center gap-2 rounded-xl lg:rounded-2xl px-3.5 py-2 lg:px-5 lg:py-3 text-[11px] lg:text-sm font-bold transition-all duration-300 ${
-                              isActive
-                                ? 'bg-tiktok-black text-white shadow-lg lg:shadow-xl scale-105 z-10'
-                                : 'bg-brand-50/80 border border-transparent text-brand-500 hover:bg-white hover:border-brand-200 hover:text-tiktok-black hover:shadow-sm'
-                            }`}
-                          >
-                            <Icon className={`h-3.5 w-3.5 lg:h-4 lg:w-4 transition-transform duration-300 ${isActive ? 'text-tiktok-cyan' : 'text-brand-300 group-hover:text-tiktok-cyan'}`} />
-                            {category === 'All' ? 'Tất cả' : category}
-                          </button>
-                      );
-                    })}
-                  </div>
+                <div className="mt-6 lg:mt-12 w-full max-w-full">
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="relative flex w-full items-center justify-center gap-2 lg:gap-4 px-4 sm:px-0">
+                      {/* Desktop Navigation Arrows */}
+                      <button 
+                        onClick={() => scrollCategories('left')}
+                        className="hidden lg:flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white border border-brand-100 text-brand-400 hover:text-tiktok-cyan hover:border-tiktok-cyan shadow-sm transition-all active:scale-90"
+                      >
+                        <ChevronLeft className="h-6 w-6" />
+                      </button>
 
-                      <div className="hidden lg:block h-6 w-px bg-brand-100 mx-3" />
+                      <div className="relative flex-1 max-w-full lg:max-w-4xl overflow-hidden">
+                        <div 
+                          ref={categoryScrollRef}
+                          className="flex w-full items-center gap-2 overflow-x-auto pb-4 no-scrollbar lg:pb-0"
+                        >
+                          <div className="flex shrink-0 items-center gap-2 lg:gap-3">
+                            {categories.map((category) => {
+                              const Icon = categoryIcons[category] || Package;
+                              const isActive = selectedCategory === category;
+                              
+                              return (
+                                  <button
+                                    key={category}
+                                    onClick={() => setSelectedCategory(category)}
+                                    className={`group flex shrink-0 items-center gap-2 rounded-xl lg:rounded-2xl px-3.5 py-2 lg:px-5 lg:py-3 text-[11px] lg:text-sm font-bold transition-all duration-300 ${
+                                      isActive
+                                        ? 'bg-tiktok-black text-white shadow-lg lg:shadow-xl scale-105 z-10'
+                                        : 'bg-brand-50/80 border border-transparent text-brand-500 hover:bg-white hover:border-brand-200 hover:text-tiktok-black hover:shadow-sm'
+                                    }`}
+                                  >
+                                    <Icon className={`h-3.5 w-3.5 lg:h-4 lg:w-4 transition-transform duration-300 ${isActive ? 'text-tiktok-cyan' : 'text-brand-300 group-hover:text-tiktok-cyan'}`} />
+                                    {category === 'All' ? 'Tất cả' : category}
+                                  </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+
+                      <button 
+                        onClick={() => scrollCategories('right')}
+                        className="hidden lg:flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white border border-brand-100 text-brand-400 hover:text-tiktok-cyan hover:border-tiktok-cyan shadow-sm transition-all active:scale-90"
+                      >
+                        <ChevronRight className="h-6 w-6" />
+                      </button>
+
+                      <div className="hidden lg:block h-6 w-px bg-brand-100 mx-1 shrink-0" />
                       
-                      <div className="pr-4 lg:pr-0">
+                      <div className="shrink-0">
                         <button
                           onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-                          className={`flex shrink-0 items-center gap-2 rounded-xl lg:rounded-2xl border px-4 py-2 lg:px-5 lg:py-3 text-[11px] lg:text-sm font-bold transition-all ${
+                          className={`flex shrink-0 items-center gap-2 rounded-xl lg:rounded-2xl border px-4 py-2 lg:px-6 lg:py-3 text-[11px] lg:text-sm font-bold transition-all ${
                             isFiltersOpen || priceRange[1] !== null || minRating > 0
                               ? 'border-tiktok-cyan bg-tiktok-cyan/5 text-tiktok-black'
                               : 'border-brand-100 bg-white text-brand-500 hover:border-brand-200 hover:shadow-sm'
@@ -260,6 +295,7 @@ export default function App() {
                           )}
                         </button>
                       </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -362,7 +398,7 @@ export default function App() {
           </section>
 
           {/* Statistics Section */}
-          <section className="py-16 bg-tiktok-black text-white overflow-hidden relative">
+          <section className="py-12 lg:py-16 bg-tiktok-black text-white overflow-hidden relative">
             <div className="absolute inset-0 opacity-10">
               <div className="absolute top-0 left-0 w-96 h-96 bg-tiktok-cyan rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2"></div>
               <div className="absolute bottom-0 right-0 w-96 h-96 bg-tiktok-magenta rounded-full blur-[120px] translate-x-1/2 translate-y-1/2"></div>
@@ -372,10 +408,10 @@ export default function App() {
                 {stats.map((stat, i) => (
                   <div key={i} className="flex flex-col items-center text-center">
                     <div className="mb-4 p-3 rounded-2xl bg-white/5 border border-white/10">
-                      <stat.icon className="h-6 w-6 text-tiktok-cyan" />
+                      <stat.icon className="h-5 w-5 lg:h-6 lg:w-6 text-tiktok-cyan" />
                     </div>
-                    <div className="text-4xl font-black mb-1">{stat.value}</div>
-                    <div className="text-sm font-bold text-brand-400 uppercase tracking-widest">{stat.label}</div>
+                    <div className="text-xl lg:text-4xl font-black mb-1">{stat.value}</div>
+                    <div className="text-[10px] lg:text-sm font-bold text-brand-400 uppercase tracking-widest">{stat.label}</div>
                   </div>
                 ))}
               </div>
@@ -383,11 +419,11 @@ export default function App() {
           </section>
 
           {/* How it works Section */}
-          <section className="py-16 lg:py-24 bg-white">
+          <section className="py-12 lg:py-24 bg-white">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <div className="mb-16 text-center">
-                <h2 className="font-sans text-4xl font-black tracking-tight text-tiktok-black mb-4">Quy trình mua hàng</h2>
-                <p className="text-brand-500 font-medium">Chỉ với 4 bước đơn giản để sở hữu dịch vụ cao cấp.</p>
+              <div className="mb-8 lg:mb-16 text-center">
+                <h2 className="font-sans text-[15px] lg:text-4xl font-black tracking-tight text-tiktok-black mb-2 lg:mb-4">Quy trình mua hàng</h2>
+                <p className="text-[13px] lg:text-lg text-brand-500 font-medium">Chỉ với 4 bước đơn giản để sở hữu dịch vụ cao cấp.</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
                 <div className="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-brand-100 -translate-y-1/2 z-0"></div>
@@ -410,11 +446,11 @@ export default function App() {
           </section>
 
           {/* Testimonials Section */}
-          <section className="py-16 lg:py-24 bg-brand-50/50 overflow-hidden">
+          <section className="py-12 lg:py-24 bg-brand-50/50 overflow-hidden">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <div className="mb-16 text-center">
-                <h2 className="font-sans text-4xl font-black tracking-tight text-tiktok-black mb-4">Khách hàng nói gì</h2>
-                <p className="text-brand-500 font-medium">Sự hài lòng của bạn là động lực phát triển của chúng tôi.</p>
+              <div className="mb-8 lg:mb-16 text-center">
+                <h2 className="font-sans text-[15px] lg:text-4xl font-black tracking-tight text-tiktok-black mb-2 lg:mb-4">Khách hàng nói gì</h2>
+                <p className="text-[13px] lg:text-lg text-brand-500 font-medium">Sự hài lòng của bạn là động lực phát triển của chúng tôi.</p>
               </div>
 
               <div className="relative">
@@ -471,11 +507,11 @@ export default function App() {
           </section>
 
           {/* FAQ Section */}
-          <section className="py-16 lg:py-24 bg-white">
+          <section className="py-12 lg:py-24 bg-white">
             <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-              <div className="mb-12 text-center">
-                <h2 className="font-sans text-4xl font-black tracking-tight text-tiktok-black mb-4">Câu hỏi thường gặp</h2>
-                <p className="text-brand-500 font-medium">Giải đáp các thắc mắc phổ biến của khách hàng.</p>
+              <div className="mb-8 lg:mb-12 text-center">
+                <h2 className="font-sans text-[15px] lg:text-4xl font-black tracking-tight text-tiktok-black mb-2 lg:mb-4">Câu hỏi thường gặp</h2>
+                <p className="text-[13px] lg:text-lg text-brand-500 font-medium">Giải đáp các thắc mắc phổ biến của khách hàng.</p>
               </div>
 
               <div className="space-y-4">
@@ -509,7 +545,7 @@ export default function App() {
           </section>
 
           {/* CTA Section */}
-          <section className="py-16 lg:py-24">
+          <section className="py-12 lg:py-24">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="relative overflow-hidden rounded-[40px] bg-tiktok-black p-8 md:p-20 text-white text-center">
                 <div className="absolute left-0 top-0 h-full w-full opacity-20">
@@ -517,17 +553,17 @@ export default function App() {
                   <div className="absolute -right-20 -bottom-20 h-96 w-96 rounded-full bg-tiktok-magenta blur-[100px]"></div>
                 </div>
                 <div className="relative z-10">
-                  <h2 className="mb-6 font-sans text-4xl font-black tracking-tight sm:text-6xl">Sẵn sàng nâng cấp trải nghiệm?</h2>
-                  <p className="mb-10 text-brand-300 text-lg max-w-2xl mx-auto">Hàng ngàn khách hàng đã tin dùng và hài lòng với dịch vụ của chúng tôi. Còn bạn thì sao?</p>
-                  <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                  <h2 className="mb-4 lg:mb-6 font-sans text-[18px] lg:text-6xl font-black tracking-tight">Sẵn sàng nâng cấp trải nghiệm?</h2>
+                  <p className="mb-8 lg:mb-10 text-brand-300 text-[13px] lg:text-lg max-w-2xl mx-auto">Hàng ngàn khách hàng đã tin dùng và hài lòng với dịch vụ của chúng tôi. Còn bạn thì sao?</p>
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3 lg:gap-4">
                     <button 
                       onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
-                      className="tiktok-button px-12 py-4 text-lg bg-white text-tiktok-black flex items-center gap-2" 
-                      style={{ boxShadow: '4px 4px 0px #00F2EA' }}
+                      className="tiktok-button px-6 py-2.5 lg:px-12 lg:py-4 text-[13px] lg:text-lg bg-white text-tiktok-black flex items-center gap-2" 
+                      style={{ boxShadow: '3px 3px 0px #00F2EA' }}
                     >
-                      Bắt đầu ngay <ArrowRight className="h-5 w-5" />
+                      Bắt đầu ngay <ArrowRight className="h-4 w-4 lg:h-5 lg:w-5" />
                     </button>
-                    <button className="px-12 py-4 text-lg font-bold border border-white/20 rounded-full hover:bg-white/10 transition-colors">
+                    <button className="px-6 py-2.5 lg:px-12 lg:py-4 text-[13px] lg:text-lg font-bold border border-white/20 rounded-full hover:bg-white/10 transition-colors">
                       Liên hệ hỗ trợ
                     </button>
                   </div>

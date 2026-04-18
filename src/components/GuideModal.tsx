@@ -107,12 +107,12 @@ export default function GuideModal({ isOpen, onClose }: GuideModalProps) {
               {/* Header */}
               <div className="relative flex items-center justify-between border-b border-brand-100 bg-white px-8 py-6">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-tiktok-black text-white">
-                    <BookOpen className="h-7 w-7" />
+                  <div className="flex h-10 w-10 lg:h-12 lg:w-12 items-center justify-center rounded-2xl bg-tiktok-black text-white">
+                    <BookOpen className="h-5 w-5 lg:h-7 lg:w-7" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-black tracking-tight text-tiktok-black uppercase">Hệ thống hướng dẫn dịch vụ</h2>
-                    <p className="text-xs font-bold text-tiktok-magenta uppercase tracking-widest">ActiveNhanh Knowledge Base</p>
+                    <h2 className="text-[15px] lg:text-xl font-black tracking-tight text-tiktok-black uppercase">Hệ thống hướng dẫn</h2>
+                    <p className="text-[9px] lg:text-xs font-bold text-tiktok-magenta uppercase tracking-widest">Knowledge Base</p>
                   </div>
                 </div>
                 <button
@@ -135,21 +135,21 @@ export default function GuideModal({ isOpen, onClose }: GuideModalProps) {
                       className="group flex flex-col rounded-[2rem] bg-white p-6 shadow-sm border border-brand-100 transition-all hover:shadow-xl hover:border-tiktok-cyan/30"
                     >
                       <div className="mb-6 flex items-center gap-4">
-                        <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${guide.bgColor} ${guide.color} transition-transform group-hover:scale-110`}>
-                          <guide.icon className="h-8 w-8" />
+                        <div className={`flex h-12 w-12 lg:h-14 lg:w-14 shrink-0 items-center justify-center rounded-2xl ${guide.bgColor} ${guide.color} transition-transform group-hover:scale-110`}>
+                          <guide.icon className="h-6 w-6 lg:h-8 lg:w-8" />
                         </div>
                         <div>
-                          <h3 className="font-black text-tiktok-black leading-tight">{guide.title}</h3>
-                          <p className="text-[10px] font-bold text-brand-400 uppercase tracking-wider mt-1">{guide.subtitle}</p>
+                          <h3 className="font-black text-tiktok-black leading-tight text-[15px] lg:text-base">{guide.title}</h3>
+                          <p className="text-[9px] lg:text-[10px] font-bold text-brand-400 uppercase tracking-wider mt-1">{guide.subtitle}</p>
                         </div>
                       </div>
 
-                      <div className="flex-1 space-y-4">
+                      <div className="flex-1 space-y-4 text-[13px] lg:text-sm">
                         {guide.items.map((item, idx) => (
                           <div key={idx} className="relative pl-4">
                             <div className="absolute left-0 top-2 h-1.5 w-1.5 rounded-full bg-tiktok-cyan" />
-                            <p className="text-xs font-bold text-tiktok-black mb-1 uppercase tracking-tight">{item.label}</p>
-                            <p className="text-xs leading-relaxed text-brand-500">{item.text}</p>
+                            <p className="text-[11px] lg:text-xs font-bold text-tiktok-black mb-1 uppercase tracking-tight">{item.label}</p>
+                            <p className="text-[11px] lg:text-xs leading-relaxed text-brand-500">{item.text}</p>
                           </div>
                         ))}
                       </div>

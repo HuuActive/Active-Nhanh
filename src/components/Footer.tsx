@@ -21,7 +21,7 @@ export default function Footer({ onDMCAClick, onContactClick, onWarrantyClick, o
                 Active<span className="text-tiktok-magenta">Nhanh</span>
               </span>
             </a>
-            <p className="mb-6 text-sm text-brand-400 leading-relaxed">
+            <p className="mb-6 text-[13px] lg:text-sm text-brand-400 leading-relaxed">
               ActiveNhanh là đơn vị cung cấp dịch vụ hỗ trợ kỹ thuật và tư vấn giải pháp phần mềm cho người dùng cuối. Chúng tôi không phải là đại lý ủy quyền trực tiếp của các hãng.
             </p>
             <div className="flex gap-4">
@@ -34,8 +34,8 @@ export default function Footer({ onDMCAClick, onContactClick, onWarrantyClick, o
           </div>
 
           <div>
-            <h4 className="mb-6 text-sm font-bold uppercase tracking-wider text-tiktok-cyan">Sản phẩm</h4>
-            <ul className="space-y-4 text-sm text-brand-400">
+            <h4 className="mb-6 text-[13px] lg:text-sm font-bold uppercase tracking-wider text-tiktok-cyan">Sản phẩm</h4>
+            <ul className="space-y-4 text-[13px] lg:text-sm text-brand-400">
               <li><a href="#" className="hover:text-white transition-colors">Google One</a></li>
               <li><a href="#" className="hover:text-white transition-colors">OneDrive</a></li>
               <li><a href="#" className="hover:text-white transition-colors">ChatGPT Plus</a></li>
@@ -44,8 +44,8 @@ export default function Footer({ onDMCAClick, onContactClick, onWarrantyClick, o
           </div>
 
           <div>
-            <h4 className="mb-6 text-sm font-bold uppercase tracking-wider text-tiktok-cyan">Hỗ trợ</h4>
-            <ul className="space-y-4 text-sm text-brand-400">
+            <h4 className="mb-6 text-[13px] lg:text-sm font-bold uppercase tracking-wider text-tiktok-cyan">Hỗ trợ</h4>
+            <ul className="space-y-4 text-[13px] lg:text-sm text-brand-400">
               <li><button onClick={onWarrantyClick} className="hover:text-white transition-colors">Chính sách bảo hành</button></li>
               <li><button onClick={onPaymentGuideClick} className="hover:text-white transition-colors">Hướng dẫn thanh toán</button></li>
               <li><a href="#" className="hover:text-white transition-colors">Câu hỏi thường gặp</a></li>
@@ -54,8 +54,8 @@ export default function Footer({ onDMCAClick, onContactClick, onWarrantyClick, o
           </div>
 
           <div>
-            <h4 className="mb-6 text-sm font-bold uppercase tracking-wider text-tiktok-cyan">Liên hệ</h4>
-            <ul className="space-y-4 text-sm text-brand-400">
+            <h4 className="mb-6 text-[13px] lg:text-sm font-bold uppercase tracking-wider text-tiktok-cyan">Liên hệ</h4>
+            <ul className="space-y-4 text-[13px] lg:text-sm text-brand-400">
               <li className="flex items-center gap-2">
                 <span className="font-bold text-white">Hotline:</span> 07 789 57 345
               </li>

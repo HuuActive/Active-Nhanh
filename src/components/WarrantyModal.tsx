@@ -27,13 +27,13 @@ export default function WarrantyModal({ isOpen, onClose }: WarrantyModalProps) {
             <div className="flex h-[85vh] flex-col">
               {/* Header */}
               <div className="relative flex items-center justify-between border-b border-brand-100 bg-white px-8 py-6">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-tiktok-magenta/10 text-tiktok-magenta">
-                    <ShieldCheck className="h-7 w-7" />
+                <div className="flex items-center gap-2 lg:gap-3">
+                  <div className="flex h-10 w-10 lg:h-12 lg:w-12 items-center justify-center rounded-2xl bg-tiktok-magenta/10 text-tiktok-magenta">
+                    <ShieldCheck className="h-5 w-5 lg:h-7 lg:w-7" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-black tracking-tight text-tiktok-black">CHÍNH SÁCH BẢO HÀNH</h2>
-                    <p className="text-xs font-bold text-brand-400 uppercase tracking-widest">Dịch vụ số ActiveNhanh</p>
+                    <h2 className="text-[18px] lg:text-xl font-black tracking-tight text-tiktok-black uppercase">CHÍNH SÁCH BẢO HÀNH</h2>
+                    <p className="text-[9px] lg:text-xs font-bold text-brand-400 uppercase tracking-widest">Dịch vụ số ActiveNhanh</p>
                   </div>
                 </div>
                 <button
@@ -48,21 +48,21 @@ export default function WarrantyModal({ isOpen, onClose }: WarrantyModalProps) {
               <div className="flex-1 overflow-y-auto p-8">
                 <div className="mx-auto max-w-3xl space-y-10">
                   {/* Intro */}
-                  <div className="rounded-3xl bg-white p-8 shadow-sm border border-brand-100 text-center">
-                    <p className="text-lg font-medium leading-relaxed text-brand-600 italic">
-                      "Tại ActiveNhanh, chúng tôi cam kết không chỉ cung cấp giải pháp mà còn đồng hành cùng quý khách trong suốt quá trình sử dụng. Chính sách bảo hành được thiết lập để đảm bảo quyền lợi cao nhất cho khách hàng."
+                  <div className="rounded-3xl bg-white p-6 lg:p-8 shadow-sm border border-brand-100 text-center">
+                    <p className="text-[15px] lg:text-lg font-medium leading-relaxed text-brand-600 italic">
+                      "Tại ActiveNhanh, chúng tôi cam kết không chỉ cung cấp giải pháp mà còn đồng hành cùng quý khách trong suốt quá trình sử dụng."
                     </p>
                   </div>
 
                   {/* 1. Thời hạn */}
                   <section className="space-y-4">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-tiktok-cyan text-tiktok-black font-black text-sm">1</div>
-                      <h3 className="text-lg font-black text-tiktok-black">Thời hạn bảo hành</h3>
+                      <div className="flex h-7 w-7 lg:h-8 lg:w-8 items-center justify-center rounded-full bg-tiktok-cyan text-tiktok-black font-black text-[12px] lg:text-sm">1</div>
+                      <h3 className="text-[16px] lg:text-lg font-black text-tiktok-black uppercase">Thời hạn bảo hành</h3>
                     </div>
                     <div className="rounded-3xl bg-white p-6 shadow-sm border border-brand-100">
-                      <p className="text-brand-600 leading-relaxed">
-                        Tất cả các gói dịch vụ (CapCut, Office 365, ChatGPT, Google One...) được bảo hành đúng và đủ theo thời gian quý khách đã đăng ký (1 tháng, 6 tháng, 1 năm...).
+                      <p className="text-[13px] lg:text-base text-brand-600 leading-relaxed">
+                        Tất cả các gói dịch vụ (CapCut, Office 365, ChatGPT, Google One...) được bảo hành đúng và đủ theo thời gian quý khách đã đăng ký.
                       </p>
                     </div>
                   </section>
@@ -70,28 +70,26 @@ export default function WarrantyModal({ isOpen, onClose }: WarrantyModalProps) {
                   {/* 2. Phạm vi */}
                   <section className="space-y-4">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-tiktok-cyan text-tiktok-black font-black text-sm">2</div>
-                      <h3 className="text-lg font-black text-tiktok-black">Phạm vi và Hình thức bảo hành</h3>
+                      <div className="flex h-7 w-7 lg:h-8 lg:w-8 items-center justify-center rounded-full bg-tiktok-cyan text-tiktok-black font-black text-[12px] lg:text-sm">2</div>
+                      <h3 className="text-[16px] lg:text-lg font-black text-tiktok-black uppercase">Phạm vi bảo hành</h3>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="rounded-3xl bg-white p-6 shadow-sm border border-brand-100">
-                        <h4 className="font-black text-tiktok-magenta mb-3 flex items-center gap-2">
+                      <div className="rounded-3xl bg-white p-5 lg:p-6 shadow-sm border border-brand-100">
+                        <h4 className="font-black text-tiktok-magenta mb-3 flex items-center gap-2 text-[14px] lg:text-base">
                           <AlertCircle className="h-4 w-4" /> Lỗi được bảo hành
                         </h4>
-                        <ul className="space-y-2 text-sm text-brand-600">
-                          <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" /> Tài khoản bị mất quyền truy cập Premium</li>
-                          <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" /> Lỗi tính năng từ phía hệ thống thiết lập</li>
-                          <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" /> Lỗi do chính sách thay đổi đột ngột từ nhà cung cấp gốc</li>
+                        <ul className="space-y-2 text-[12px] lg:text-sm text-brand-600">
+                          <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" /> Tài khoản bị mất quyền Premium</li>
+                          <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" /> Lỗi tính năng từ hệ thống</li>
                         </ul>
                       </div>
-                      <div className="rounded-3xl bg-white p-6 shadow-sm border border-brand-100">
-                        <h4 className="font-black text-tiktok-cyan mb-3 flex items-center gap-2">
+                      <div className="rounded-3xl bg-white p-5 lg:p-6 shadow-sm border border-brand-100">
+                        <h4 className="font-black text-tiktok-cyan mb-3 flex items-center gap-2 text-[14px] lg:text-base">
                           <Clock className="h-4 w-4" /> Hình thức hỗ trợ
                         </h4>
-                        <ul className="space-y-2 text-sm text-brand-600">
-                          <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" /> Khắc phục lại quyền truy cập trong vòng 24h</li>
-                          <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" /> Cung cấp tài khoản thay thế nếu không thể khắc phục</li>
-                          <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" /> <strong>Lỗi 1 đổi 1</strong> suốt thời hạn sử dụng</li>
+                        <ul className="space-y-2 text-[12px] lg:text-sm text-brand-600">
+                          <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" /> Khắc phục trong vòng 24h</li>
+                          <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" /> <strong>Lỗi 1 đổi 1</strong> trọn đời gói</li>
                         </ul>
                       </div>
                     </div>

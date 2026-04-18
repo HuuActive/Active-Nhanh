@@ -20,11 +20,11 @@ export default function RecentlyViewed({ products, onAddToCart, onView }: Recent
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-tiktok-magenta">
               <History className="h-6 w-6" />
             </div>
-            <h2 className="font-sans text-2xl font-black text-tiktok-black">Sản phẩm vừa xem</h2>
+            <h2 className="font-sans text-[18px] lg:text-2xl font-black text-tiktok-black">Sản phẩm vừa xem</h2>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 md:gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 md:gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {products.map((product) => (
             <motion.div
               key={product.id}
@@ -40,8 +40,8 @@ export default function RecentlyViewed({ products, onAddToCart, onView }: Recent
                 referrerPolicy="no-referrer"
               />
               <div className="flex-1 overflow-hidden">
-                <h3 className="truncate text-sm font-bold text-tiktok-black">{product.name}</h3>
-                <p className="text-sm font-black text-tiktok-magenta">{formatPrice(product.price)}</p>
+                <h3 className="truncate text-[13px] lg:text-sm font-bold text-tiktok-black">{product.name}</h3>
+                <p className="text-[13px] lg:text-sm font-black text-tiktok-magenta">{formatPrice(product.price)}</p>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();

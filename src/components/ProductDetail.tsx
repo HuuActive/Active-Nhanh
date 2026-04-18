@@ -247,16 +247,16 @@ export default function ProductDetail({ product, isOpen, onClose, onAddToCart }:
                     <span className="mb-4 inline-block rounded-full bg-brand-100 px-4 py-1 text-xs font-bold text-brand-500">
                       {product.category}
                     </span>
-                    <h2 className="mb-4 font-sans text-4xl font-black tracking-tight text-tiktok-black">
+                    <h2 className="mb-4 font-sans text-[22px] lg:text-4xl font-black tracking-tight text-tiktok-black">
                       {product.name}
                     </h2>
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-1">
                         {[...Array(5)].map((_, i) => (
-                          <Star key={i} className={`h-4 w-4 ${i < Math.floor(product.rating) ? 'fill-yellow-400 text-yellow-400' : 'text-brand-200'}`} />
+                          <Star key={i} className={`h-3 w-3 lg:h-4 lg:w-4 ${i < Math.floor(product.rating) ? 'fill-yellow-400 text-yellow-400' : 'text-brand-200'}`} />
                         ))}
                       </div>
-                      <span className="text-sm font-bold text-brand-400">({reviews.length} đánh giá từ khách hàng)</span>
+                      <span className="text-[12px] lg:text-sm font-bold text-brand-400">({reviews.length} đánh giá từ khách hàng)</span>
                     </div>
                     <div className="mt-4 flex items-center gap-2">
                       <span className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-wider ${displayStock > 0 ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
@@ -265,14 +265,14 @@ export default function ProductDetail({ product, isOpen, onClose, onAddToCart }:
                     </div>
                   </div>
 
-                    <div className="mb-8 flex flex-wrap items-baseline gap-4">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-3xl sm:text-5xl font-black text-tiktok-magenta">{formatPrice(displayPrice)}</span>
+                    <div className="mb-8 flex flex-wrap items-baseline gap-2 lg:gap-4">
+                      <div className="flex items-baseline gap-1 lg:gap-2">
+                        <span className="text-2xl lg:text-5xl font-black text-tiktok-magenta">{formatPrice(displayPrice)}</span>
                         {product.priceUnit && (
-                          <span className="text-xs sm:text-sm font-bold text-brand-400 uppercase">/ {product.priceUnit}</span>
+                          <span className="text-[10px] lg:text-sm font-bold text-brand-400 uppercase">/ {product.priceUnit}</span>
                         )}
                       </div>
-                      <span className="text-lg sm:text-xl font-bold text-brand-300 line-through">
+                      <span className="text-sm lg:text-xl font-bold text-brand-300 line-through">
                         {formatPrice(displayOriginalPrice || Math.ceil((displayPrice * 1.8) / 10000) * 10000)}
                       </span>
                     </div>
@@ -280,7 +280,7 @@ export default function ProductDetail({ product, isOpen, onClose, onAddToCart }:
                   {/* Variants Selection */}
                   {product.variants && product.variants.length > 0 && (
                     <div className="mb-8 space-y-4">
-                      <h3 className="flex items-center gap-2 text-sm font-black uppercase tracking-wider text-tiktok-black">
+                      <h3 className="flex items-center gap-2 text-[13px] lg:text-sm font-black uppercase tracking-wider text-tiktok-black">
                         <Tag className="h-4 w-4" /> Chọn phân loại
                       </h3>
                       <div className="flex flex-wrap gap-2">
@@ -288,7 +288,7 @@ export default function ProductDetail({ product, isOpen, onClose, onAddToCart }:
                           <button
                             key={v.id}
                             onClick={() => setSelectedVariantId(v.id)}
-                            className={`rounded-xl border-2 px-4 py-2 text-sm font-bold transition-all ${
+                            className={`rounded-xl border-2 px-3 py-1.5 lg:px-4 lg:py-2 text-[12px] lg:text-sm font-bold transition-all ${
                               selectedVariantId === v.id
                                 ? 'border-tiktok-magenta bg-tiktok-magenta/5 text-tiktok-magenta'
                                 : 'border-brand-100 bg-white text-brand-500 hover:border-brand-200'
@@ -303,16 +303,16 @@ export default function ProductDetail({ product, isOpen, onClose, onAddToCart }:
 
                   {/* Key Features */}
                   <div className="mb-10 space-y-4">
-                    <h3 className="flex items-center gap-2 text-sm font-black uppercase tracking-wider text-tiktok-black">
+                    <h3 className="flex items-center gap-2 text-[13px] lg:text-sm font-black uppercase tracking-wider text-tiktok-black">
                       <Info className="h-4 w-4" /> Đặc điểm nổi bật
                     </h3>
                     <div className="space-y-3">
                       {(product.shortFeatures || 'Dung lượng cao;Bảo hành uy tín;Kích hoạt chính chủ').split(';').map((feature, idx) => {
                         const displayFeature = feature.toLowerCase().includes('1tb') ? 'Tặng kèm 1TB lưu trữ Cloud Team mượt mà' : feature;
                         return (
-                          <div key={idx} className="flex items-center gap-3 rounded-2xl bg-brand-50 p-4 transition-colors hover:bg-brand-100">
-                            <CheckCircle2 className="h-5 w-5 text-tiktok-cyan" />
-                            <span className="text-sm font-bold text-tiktok-black">{displayFeature}</span>
+                          <div key={idx} className="flex items-center gap-3 rounded-2xl bg-brand-50 p-3 lg:p-4 transition-colors hover:bg-brand-100">
+                            <CheckCircle2 className="h-4 w-4 lg:h-5 lg:w-5 text-tiktok-cyan" />
+                            <span className="text-[13px] lg:text-sm font-bold text-tiktok-black">{displayFeature}</span>
                           </div>
                         );
                       })}
@@ -332,9 +332,9 @@ export default function ProductDetail({ product, isOpen, onClose, onAddToCart }:
                           }
                         }}
                         disabled={displayStock <= 0}
-                        className={`flex-1 flex items-center justify-center gap-3 rounded-2xl py-5 text-xl font-black text-white shadow-xl transition-all ${displayStock > 0 ? 'bg-tiktok-black hover:scale-[1.02] active:scale-95 cursor-pointer' : 'bg-brand-200 cursor-not-allowed'}`}
+                        className={`flex-1 flex items-center justify-center gap-2 lg:gap-3 rounded-2xl py-3.5 lg:py-5 text-[15px] lg:text-xl font-black text-white shadow-xl transition-all ${displayStock > 0 ? 'bg-tiktok-black hover:scale-[1.02] active:scale-95 cursor-pointer' : 'bg-brand-200 cursor-not-allowed'}`}
                       >
-                        <ShoppingCart className="h-6 w-6" /> {displayStock > 0 ? 'Thêm vào giỏ hàng' : 'Hết hàng'}
+                        <ShoppingCart className="h-5 w-5 lg:h-6 lg:w-6" /> {displayStock > 0 ? 'Thêm vào giỏ hàng' : 'Hết hàng'}
                       </button>
                       
                       <div className="relative">
@@ -463,10 +463,10 @@ export default function ProductDetail({ product, isOpen, onClose, onAddToCart }:
                     {activeTab === 'description' && (
                       <div className="space-y-12">
                         <div className="rounded-3xl bg-white p-8 shadow-sm border border-brand-100">
-                          <h3 className="mb-8 flex items-center gap-3 text-xl font-black text-tiktok-black">
+                          <h3 className="mb-8 flex items-center gap-3 text-[18px] lg:text-xl font-black text-tiktok-black">
                             <Info className="h-6 w-6 text-tiktok-cyan" /> Thông tin chi tiết {product.name}
                           </h3>
-                          <div className="markdown-body space-y-8">
+                          <div className="markdown-body space-y-8 text-[13px] lg:text-base">
                             <section>
                               <ReactMarkdown>{product.description}</ReactMarkdown>
                             </section>
@@ -476,7 +476,7 @@ export default function ProductDetail({ product, isOpen, onClose, onAddToCart }:
                         {/* Why Choose Us & Warranty Cards */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                           <div className="rounded-3xl bg-white p-8 shadow-sm border border-brand-100">
-                            <h4 className="mb-6 flex items-center gap-2 text-base font-black text-tiktok-black">
+                            <h4 className="mb-6 flex items-center gap-2 text-[15px] lg:text-base font-black text-tiktok-black">
                               <Zap className="h-5 w-5 text-yellow-500" /> Tại sao nên chọn chúng tôi?
                             </h4>
                             <ul className="space-y-4">
@@ -485,17 +485,17 @@ export default function ProductDetail({ product, isOpen, onClose, onAddToCart }:
                                 'Hỗ trợ kích hoạt & Bàn giao ngay trong 5-15 phút',
                                 'Đồng hành & Hỗ trợ kỹ thuật trọn đời gói dịch vụ'
                               ].map((item, i) => (
-                                <li key={i} className="flex items-center gap-3 text-sm font-medium text-brand-600">
+                                <li key={i} className="flex items-center gap-3 text-[13px] lg:text-sm font-medium text-brand-600">
                                   <CheckCircle2 className="h-4 w-4 text-green-500" /> {item}
                                 </li>
                               ))}
                             </ul>
                           </div>
                           <div className="rounded-3xl bg-white p-8 shadow-sm border border-brand-100">
-                            <h4 className="mb-6 flex items-center gap-2 text-base font-black text-tiktok-black">
+                            <h4 className="mb-6 flex items-center gap-2 text-[15px] lg:text-base font-black text-tiktok-black">
                               <ShieldCheck className="h-5 w-5 text-tiktok-magenta" /> Cam kết bảo hành
                             </h4>
-                            <p className="text-sm leading-relaxed text-brand-600">
+                            <p className="text-[13px] lg:text-sm leading-relaxed text-brand-600">
                               Cam kết duy trì quyền truy cập suốt thời hạn gói dịch vụ. Hoàn phí dịch vụ theo tỷ lệ thời gian chưa sử dụng nếu gặp sự cố từ nhà cung cấp gốc.
                             </p>
                           </div>
@@ -504,22 +504,22 @@ export default function ProductDetail({ product, isOpen, onClose, onAddToCart }:
                     )}
 
                     {activeTab === 'guide' && (
-                      <div className="rounded-3xl bg-white p-8 shadow-sm border border-brand-100">
-                        <h3 className="mb-8 flex items-center gap-3 text-xl font-black text-tiktok-black">
+                      <div className="rounded-3xl bg-white p-6 lg:p-8 shadow-sm border border-brand-100">
+                        <h3 className="mb-8 flex items-center gap-3 text-[18px] lg:text-xl font-black text-tiktok-black">
                           <HelpCircle className="h-6 w-6 text-tiktok-cyan" /> Hướng dẫn sử dụng
                         </h3>
-                        <div className="markdown-body">
+                        <div className="markdown-body text-[13px] lg:text-base">
                           <ReactMarkdown>{product.usageGuide || 'Đang cập nhật hướng dẫn sử dụng cho sản phẩm này...'}</ReactMarkdown>
                         </div>
                       </div>
                     )}
 
                     {activeTab === 'terms' && (
-                      <div className="rounded-3xl bg-white p-8 shadow-sm border border-brand-100">
-                        <h3 className="mb-8 flex items-center gap-3 text-xl font-black text-tiktok-black">
+                      <div className="rounded-3xl bg-white p-6 lg:p-8 shadow-sm border border-brand-100">
+                        <h3 className="mb-8 flex items-center gap-3 text-[18px] lg:text-xl font-black text-tiktok-black">
                           <ShieldCheck className="h-6 w-6 text-tiktok-magenta" /> Quy định sử dụng dịch vụ
                         </h3>
-                        <div className="space-y-8 text-sm leading-relaxed text-brand-600">
+                        <div className="space-y-8 text-[13px] lg:text-sm leading-relaxed text-brand-600">
                           <section>
                             <h4 className="mb-3 font-black text-tiktok-black flex items-center gap-2">
                               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-100 text-xs text-brand-500">1</span>
@@ -640,8 +640,8 @@ export default function ProductDetail({ product, isOpen, onClose, onAddToCart }:
               {/* Reviews Section */}
               <div className="bg-brand-50 py-20">
                 <div className="mx-auto max-w-4xl px-6">
-                  <h3 className="mb-12 flex items-center gap-3 text-2xl font-black text-tiktok-black">
-                    <Star className="h-8 w-8 fill-yellow-400 text-yellow-400" /> Đánh giá từ khách hàng ({reviews.length})
+                  <h3 className="mb-12 flex items-center gap-3 text-[18px] lg:text-2xl font-black text-tiktok-black">
+                    <Star className="h-6 w-6 lg:h-8 lg:w-8 fill-yellow-400 text-yellow-400" /> Đánh giá từ khách hàng ({reviews.length})
                   </h3>
 
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">

@@ -32,21 +32,21 @@ export default function DMCAModal({ isOpen, onClose }: DMCAModalProps) {
               <X className="h-5 w-5" />
             </button>
 
-            <div className="p-8 lg:p-12">
-              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-tiktok-cyan/10 text-tiktok-cyan">
-                <Shield className="h-8 w-8" />
+            <div className="p-6 lg:p-12">
+              <div className="mb-6 flex h-12 w-12 lg:h-16 lg:w-16 items-center justify-center rounded-2xl bg-tiktok-cyan/10 text-tiktok-cyan">
+                <Shield className="h-6 w-6 lg:h-8 lg:w-8" />
               </div>
               
-              <h2 className="mb-6 text-3xl font-black tracking-tight text-tiktok-black">Chính sách DMCA</h2>
+              <h2 className="mb-6 text-[20px] lg:text-3xl font-black tracking-tight text-tiktok-black uppercase">Chính sách DMCA</h2>
               
-              <div className="prose prose-sm max-h-[50vh] overflow-y-auto pr-4 text-brand-600">
+              <div className="prose prose-sm max-h-[50vh] overflow-y-auto pr-4 text-brand-600 text-[13px] lg:text-sm">
                 <p className="mb-4">
-                  ActiveNhanh tôn trọng quyền sở hữu trí tuệ của người khác và yêu cầu người dùng của chúng tôi cũng làm như vậy. Theo Đạo luật Bản quyền Thiên niên kỷ Kỹ thuật số (DMCA), chúng tôi sẽ phản hồi nhanh chóng các khiếu nại về vi phạm bản quyền được báo cáo cho chúng tôi.
+                  ActiveNhanh tôn trọng quyền sở hữu trí tuệ của người khác. Theo Đạo luật Bản quyền Thiên niên kỷ Kỹ thuật số (DMCA).
                 </p>
                 
-                <h3 className="mb-2 font-bold text-tiktok-black">1. Thông báo vi phạm</h3>
+                <h3 className="mb-2 font-black text-tiktok-black text-[14px] lg:text-base uppercase">1. Thông báo vi phạm</h3>
                 <p className="mb-4">
-                  Nếu bạn là chủ sở hữu bản quyền và tin rằng bất kỳ nội dung nào trên trang web này vi phạm bản quyền của bạn, vui lòng gửi thông báo bằng văn bản cho chúng tôi bao gồm:
+                  Nếu anh bảo lưu bản quyền và tin rằng bất kỳ nội dung nào vi phạm, vui lòng gửi thông báo cho chúng tôi.
                 </p>
                 <ul className="mb-4 list-disc pl-5 space-y-2">
                   <li>Chữ ký vật lý hoặc điện tử của người được ủy quyền thay mặt chủ sở hữu bản quyền.</li>

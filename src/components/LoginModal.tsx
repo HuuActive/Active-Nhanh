@@ -98,14 +98,14 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           </button>
           
           <div className="flex items-center gap-3 mb-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10">
-              <LogIn className="h-6 w-6 text-tiktok-cyan" />
+            <div className="flex h-8 w-8 lg:h-10 lg:w-10 items-center justify-center rounded-xl bg-white/10">
+              <LogIn className="h-5 w-5 lg:h-6 lg:w-6 text-tiktok-cyan" />
             </div>
-            <h2 className="text-2xl font-black italic uppercase tracking-tight">
+            <h2 className="text-[20px] lg:text-2xl font-black italic uppercase tracking-tight">
               {mode === 'login' ? 'Đăng nhập' : mode === 'register' ? 'Đăng ký' : 'Quên mật khẩu'}
             </h2>
           </div>
-          <p className="text-sm text-brand-300 font-medium">
+          <p className="text-[13px] lg:text-sm text-brand-300 font-medium">
             {mode === 'login' ? 'Chào mừng bạn quay trở lại với ActiveNhanh' : mode === 'register' ? 'Bắt đầu trải nghiệm các dịch vụ Premium' : 'Nhận mã đặt lại mật khẩu của bạn'}
           </p>
         </div>
@@ -136,7 +136,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
               {mode === 'register' && (
                 <div className="space-y-1">
-                  <label className="text-xs font-black uppercase tracking-widest text-brand-400 ml-2">Họ và tên</label>
+                  <label className="text-[11px] lg:text-xs font-black uppercase tracking-widest text-brand-400 ml-2">Họ và tên</label>
                   <div className="relative">
                     <User className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-brand-300" />
                     <input
@@ -145,14 +145,14 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Nguyễn Văn A"
-                      className="w-full rounded-2xl border border-brand-100 bg-brand-50 py-4 pl-12 pr-4 text-sm font-bold focus:border-tiktok-cyan focus:outline-none transition-all"
+                      className="w-full rounded-2xl border border-brand-100 bg-brand-50 py-3 lg:py-4 pl-12 pr-4 text-[13px] lg:text-sm font-bold focus:border-tiktok-cyan focus:outline-none transition-all"
                     />
                   </div>
                 </div>
               )}
 
               <div className="space-y-1">
-                <label className="text-xs font-black uppercase tracking-widest text-brand-400 ml-2">Email</label>
+                <label className="text-[11px] lg:text-xs font-black uppercase tracking-widest text-brand-400 ml-2">Email</label>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-brand-300" />
                   <input
@@ -161,7 +161,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="email@example.com"
-                    className="w-full rounded-2xl border border-brand-100 bg-brand-50 py-4 pl-12 pr-4 text-sm font-bold focus:border-tiktok-cyan focus:outline-none transition-all"
+                    className="w-full rounded-2xl border border-brand-100 bg-brand-50 py-3 lg:py-4 pl-12 pr-4 text-[13px] lg:text-sm font-bold focus:border-tiktok-cyan focus:outline-none transition-all"
                   />
                 </div>
               </div>
@@ -169,12 +169,12 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
               {mode !== 'forgot-password' && (
                 <div className="space-y-1">
                   <div className="flex justify-between items-center ml-2 mr-2">
-                    <label className="text-xs font-black uppercase tracking-widest text-brand-400">Mật khẩu</label>
+                    <label className="text-[11px] lg:text-xs font-black uppercase tracking-widest text-brand-400">Mật khẩu</label>
                     {mode === 'login' && (
                       <button 
                         type="button"
                         onClick={() => setMode('forgot-password')}
-                        className="text-[10px] font-bold text-tiktok-magenta hover:underline"
+                        className="text-[9px] lg:text-[10px] font-bold text-tiktok-magenta hover:underline"
                       >
                         Quên mật khẩu?
                       </button>
@@ -188,7 +188,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full rounded-2xl border border-brand-100 bg-brand-50 py-4 pl-12 pr-4 text-sm font-bold focus:border-tiktok-cyan focus:outline-none transition-all"
+                      className="w-full rounded-2xl border border-brand-100 bg-brand-50 py-3 lg:py-4 pl-12 pr-4 text-[13px] lg:text-sm font-bold focus:border-tiktok-cyan focus:outline-none transition-all"
                     />
                   </div>
                 </div>
@@ -197,7 +197,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full tiktok-button py-4 text-base font-black flex items-center justify-center gap-2 group shadow-[0_4px_0_#00c2bb]"
+                className="w-full tiktok-button py-3 lg:py-4 text-[14px] lg:text-base font-black flex items-center justify-center gap-2 group shadow-[0_4px_0_#00c2bb]"
               >
                 {loading ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
