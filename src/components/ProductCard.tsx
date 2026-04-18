@@ -13,13 +13,16 @@ interface ProductCardProps {
 export default function ProductCard({ product, onAddToCart, onView }: ProductCardProps) {
   const [isSharing, setIsSharing] = useState(false);
 
-  const handleView = () => {
+  const handleView = (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
     if (onView) onView(product);
   };
 
   const handleShare = async (e: React.MouseEvent, platform: 'facebook' | 'link') => {
     e.stopPropagation();
-    const url = `${window.location.origin}?product=${product.id}`;
+    const url = product.slug 
+      ? `${window.location.origin}/san-pham/${product.slug}`
+      : `${window.location.origin}?product=${product.id}`;
     
     if (platform === 'facebook') {
       window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
@@ -34,6 +37,8 @@ export default function ProductCard({ product, onAddToCart, onView }: ProductCar
     setIsSharing(false);
   };
 
+  const productUrl = product.slug ? `/san-pham/${product.slug}` : `/?product=${product.id}`;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -41,8 +46,9 @@ export default function ProductCard({ product, onAddToCart, onView }: ProductCar
       viewport={{ once: true }}
       className="tiktok-card group relative flex flex-col overflow-hidden"
     >
-      <div 
-        className="relative aspect-square overflow-hidden rounded-lg bg-brand-50 cursor-pointer"
+      <a 
+        href={productUrl}
+        className="relative aspect-square overflow-hidden rounded-lg bg-brand-50 cursor-pointer block"
         onClick={handleView}
       >
         <img
@@ -96,16 +102,17 @@ export default function ProductCard({ product, onAddToCart, onView }: ProductCar
             </AnimatePresence>
           </div>
         </div>
-      </div>
+      </a>
 
       <div className="flex flex-1 flex-col pt-3 md:pt-4">
         <div className="mb-1 flex items-start gap-1 justify-between">
-          <h3 
+          <a
+            href={productUrl}
             className="font-sans text-[13px] md:text-lg font-extrabold tracking-tight text-tiktok-black line-clamp-2 md:line-clamp-1 cursor-pointer hover:text-tiktok-cyan transition-colors"
             onClick={handleView}
           >
             {product.name}
-          </h3>
+          </a>
           <div className="flex items-center gap-0.5 shrink-0 pt-0.5">
             <Star className="h-2 w-2 md:h-3 md:w-3 fill-tiktok-cyan text-tiktok-cyan" />
             <span className="text-[10px] md:text-xs font-bold text-tiktok-black">{product.rating}</span>

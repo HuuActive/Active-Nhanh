@@ -26,12 +26,16 @@ export default function RecentlyViewed({ products, onAddToCart, onView }: Recent
 
         <div className="grid grid-cols-1 gap-3 md:gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {products.map((product) => (
-            <motion.div
+            <motion.a
               key={product.id}
+              href={product.slug ? `/san-pham/${product.slug}` : `/?product=${product.id}`}
+              onClick={(e) => {
+                e.preventDefault();
+                onView(product);
+              }}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               className="flex items-center gap-4 rounded-2xl border border-brand-100 p-3 transition-all hover:border-tiktok-cyan hover:shadow-sm cursor-pointer"
-              onClick={() => onView(product)}
             >
               <img
                 src={product.image}
@@ -44,6 +48,7 @@ export default function RecentlyViewed({ products, onAddToCart, onView }: Recent
                 <p className="text-[13px] lg:text-sm font-black text-tiktok-magenta">{formatPrice(product.price)}</p>
                 <button
                   onClick={(e) => {
+                    e.preventDefault();
                     e.stopPropagation();
                     onAddToCart(product);
                   }}
@@ -52,7 +57,7 @@ export default function RecentlyViewed({ products, onAddToCart, onView }: Recent
                   Thêm vào giỏ
                 </button>
               </div>
-            </motion.div>
+            </motion.a>
           ))}
         </div>
       </div>

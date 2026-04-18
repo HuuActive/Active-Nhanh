@@ -4,7 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, collection, query, where, getDocs, limit } from 'firebase/firestore';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -42,6 +42,10 @@ async function startServer() {
   app.get('*all', async (req, res, next) => {
     const url = req.originalUrl;
     const productId = req.query.product as string;
+    
+    // Check if the path is /san-pham/:slug
+    const productSlugMatch = url.match(/\/san-pham\/([a-zA-Z0-9_-]+)/);
+    const productSlug = productSlugMatch ? productSlugMatch[1] : null;
 
     try {
       let templatePath = '';
@@ -62,13 +66,27 @@ async function startServer() {
       let description = "ActiveNhanh cung cấp các loại tài khoản cao cấp: Youtube Premium, Netflix, Canva Pro, Windows, Office... giá rẻ, uy tín, bảo hành 1 đổi 1.";
       let image = "https://picsum.photos/seed/activenhanh/1200/630";
 
-      // If product ID exists, try to fetch its data
-      if (productId) {
+      // If product ID or Slug exists, try to fetch its data
+      if (productId || productSlug) {
         try {
-          const productRef = doc(db, 'products', productId);
-          const productSnap = await getDoc(productRef);
-          if (productSnap.exists()) {
-            const productData = productSnap.data();
+          let productData: any = null;
+          
+          if (productId) {
+            const productRef = doc(db, 'products', productId);
+            const productSnap = await getDoc(productRef);
+            if (productSnap.exists()) {
+              productData = productSnap.data();
+            }
+          } else if (productSlug) {
+            const productsRef = collection(db, 'products');
+            const q = query(productsRef, where('slug', '==', productSlug), limit(1));
+            const querySnapshot = await getDocs(q);
+            if (!querySnapshot.empty) {
+              productData = querySnapshot.docs[0].data();
+            }
+          }
+
+          if (productData) {
             title = productData.seoTitle || `${productData.name} - ActiveNhanh`;
             description = productData.seoDescription || productData.description || description;
             image = productData.image || image;

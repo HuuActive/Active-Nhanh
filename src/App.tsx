@@ -201,7 +201,43 @@ export default function App() {
   const handleViewProduct = (product: Product) => {
     setSelectedProduct(product);
     addToRecentlyViewed(product);
+    
+    // Update URL to friendly slug for SEO
+    const newUrl = `/san-pham/${product.slug}`;
+    window.history.pushState({ productId: product.id }, "", newUrl);
   };
+
+  const handleCloseProduct = () => {
+    setSelectedProduct(null);
+    window.history.pushState({}, "", "/");
+  };
+
+  // Handle Initial Load and Popstate for Routing
+  useEffect(() => {
+    if (products.length === 0) return;
+
+    const handleRouting = () => {
+      const path = window.location.pathname;
+      const params = new URLSearchParams(window.location.search);
+      const productId = params.get('product');
+      const slugMatch = path.match(/\/san-pham\/([a-zA-Z0-9_-]+)/);
+      const slug = slugMatch ? slugMatch[1] : null;
+
+      if (slug) {
+        const product = products.find(p => p.slug === slug);
+        if (product) setSelectedProduct(product);
+      } else if (productId) {
+        const product = products.find(p => p.id === productId);
+        if (product) setSelectedProduct(product);
+      } else {
+        setSelectedProduct(null);
+      }
+    };
+
+    handleRouting();
+    window.addEventListener('popstate', handleRouting);
+    return () => window.removeEventListener('popstate', handleRouting);
+  }, [products]);
 
   return (
     <ErrorBoundary>
@@ -650,7 +686,7 @@ export default function App() {
         <ProductDetail
           product={selectedProduct}
           isOpen={!!selectedProduct}
-          onClose={() => setSelectedProduct(null)}
+          onClose={handleCloseProduct}
           onAddToCart={addToCart}
         />
       </div>

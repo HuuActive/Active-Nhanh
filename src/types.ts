@@ -33,6 +33,7 @@ export interface Product {
   rating: number;
   reviews: number;
   stock: number;
+  slug?: string; // Friendly URL slug
   seoTitle?: string;
   seoDescription?: string;
   seoKeywords?: string;

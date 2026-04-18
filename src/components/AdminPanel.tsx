@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { X, Plus, Edit2, Trash2, Save, Loader2, Upload, Search, Info, Package, Shield, HelpCircle, Layout, Eye, Zap, ShoppingBag, CheckCircle, Clock, AlertCircle, User, Users, Tag, Star } from 'lucide-react';
 import { useProducts, useOrders, useUsers, useCategories, useReviews } from '../hooks/useFirebase';
 import { Product, Category } from '../types';
-import { formatPrice } from '../lib/utils';
+import { formatPrice, createSlug } from '../lib/utils';
 
 interface AdminPanelProps {
   isOpen: boolean;
@@ -54,6 +54,7 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
     rating: 5,
     reviews: 0,
     stock: 0,
+    slug: '',
     seoTitle: '',
     seoDescription: '',
     seoKeywords: ''
@@ -103,6 +104,7 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
       rating: product.rating,
       reviews: product.reviews,
       stock: product.stock || 0,
+      slug: product.slug || '',
       seoTitle: product.seoTitle || '',
       seoDescription: product.seoDescription || '',
       seoKeywords: product.seoKeywords || ''
@@ -138,8 +140,12 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
     
     const fullDesc = parts.join('\n\n');
     
+    // Ensure slug is created
+    const finalSlug = (formData.slug || createSlug(formData.name)) || Math.random().toString(36).substr(2, 9);
+    
     const dataToSave = {
       ...formData,
+      slug: finalSlug,
       description: fullDesc
     };
 
@@ -172,6 +178,7 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
       rating: 5,
       reviews: 0,
       stock: 0,
+      slug: '',
       seoTitle: '',
       seoDescription: '',
       seoKeywords: ''
@@ -274,6 +281,21 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
                       className="flex items-center gap-2 rounded-full bg-brand-100 px-4 py-2 text-xs font-bold text-brand-600 hover:bg-brand-200"
                     >
                       <Layout className="h-4 w-4" /> Cập nhật ảnh mẫu
+                    </button>
+                    <button 
+                      onClick={async () => {
+                        if (confirm('Bạn có chắc chắn muốn tạo Slug cho tất cả sản phẩm chưa có?')) {
+                          for (const p of products) {
+                            if (!p.slug) {
+                              await editProduct(p.id, { slug: createSlug(p.name) });
+                            }
+                          }
+                          alert('Đã cập nhật xong Slug!');
+                        }
+                      }}
+                      className="flex items-center gap-2 rounded-full bg-brand-100 px-4 py-2 text-xs font-bold text-brand-600 hover:bg-brand-200"
+                    >
+                      <Zap className="h-4 w-4" /> Cập nhật SEO/Slug
                     </button>
                     <button 
                       onClick={() => { setIsAdding(true); setEditingId(null); resetForm(); }}
@@ -692,6 +714,25 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
                           </div>
 
                           <div className="space-y-4">
+                            <div>
+                              <label className="mb-1 block text-xs font-bold uppercase text-brand-400">Đường dẫn thân thiện (Slug)</label>
+                              <div className="flex items-center gap-2">
+                                <input 
+                                  type="text" 
+                                  value={formData.slug}
+                                  onChange={(e) => setFormData({...formData, slug: e.target.value})}
+                                  className="w-full rounded-xl border border-brand-100 bg-white p-3 text-sm focus:border-tiktok-cyan focus:outline-none"
+                                  placeholder="Ví dụ: youtube-premium-1-nam"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => setFormData({...formData, slug: createSlug(formData.name)})}
+                                  className="flex h-11 px-4 items-center justify-center rounded-xl bg-brand-50 text-[10px] font-bold text-tiktok-cyan hover:bg-brand-100 transition-colors"
+                                >
+                                  Tạo tự động
+                                </button>
+                              </div>
+                            </div>
                             <div>
                               <label className="mb-1 block text-xs font-bold uppercase text-brand-400">Tiêu đề SEO</label>
                               <input 
