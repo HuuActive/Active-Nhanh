@@ -1,6 +1,8 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { X, ShoppingCart, Star, ShieldCheck, Zap, MessageCircle, Info, Package, HelpCircle, CheckCircle2, History, Send, Share2, Facebook, Link, Trash2, Reply, Phone, Mail, Loader2, Tag } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
 import { useState } from 'react';
 import emailjs from '@emailjs/browser';
 import { Product } from '../types';
@@ -468,7 +470,7 @@ export default function ProductDetail({ product, isOpen, onClose, onAddToCart }:
                           </h3>
                           <div className="markdown-body space-y-8 text-[13px] lg:text-base">
                             <section>
-                              <ReactMarkdown>{product.description}</ReactMarkdown>
+                              <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>{product.description}</ReactMarkdown>
                             </section>
                           </div>
                         </div>
@@ -509,7 +511,7 @@ export default function ProductDetail({ product, isOpen, onClose, onAddToCart }:
                           <HelpCircle className="h-6 w-6 text-tiktok-cyan" /> Hướng dẫn sử dụng
                         </h3>
                         <div className="markdown-body text-[13px] lg:text-base">
-                          <ReactMarkdown>{product.usageGuide || 'Đang cập nhật hướng dẫn sử dụng cho sản phẩm này...'}</ReactMarkdown>
+                          <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>{product.usageGuide || 'Đang cập nhật hướng dẫn sử dụng cho sản phẩm này...'}</ReactMarkdown>
                         </div>
                       </div>
                     )}

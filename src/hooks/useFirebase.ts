@@ -30,7 +30,7 @@ import {
   sendPasswordResetEmail
 } from 'firebase/auth';
 import { db, auth, handleFirestoreError, OperationType } from '../lib/firebase';
-import { Product, Category } from '../types';
+import { Product, Category, Post, PostComment } from '../types';
 
 export function useProducts() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -509,4 +509,163 @@ export function useCategories() {
   };
 
   return { categories, loading, addCategory, editCategory, removeCategory };
+}
+
+export function usePosts() {
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const items = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Post[];
+      setPosts(items);
+      setLoading(false);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, 'posts');
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const addPost = async (post: Omit<Post, 'id' | 'createdAt' | 'updatedAt' | 'views'>) => {
+    try {
+      await addDoc(collection(db, 'posts'), {
+        ...post,
+        views: 0,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      handleFirestoreError(error, OperationType.CREATE, 'posts');
+    }
+  };
+
+  const editPost = async (id: string, post: Partial<Post>) => {
+    try {
+      const postRef = doc(db, 'posts', id);
+      await updateDoc(postRef, {
+        ...post,
+        updatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `posts/${id}`);
+    }
+  };
+
+  const removePost = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, 'posts', id));
+    } catch (error) {
+      handleFirestoreError(error, OperationType.DELETE, `posts/${id}`);
+    }
+  };
+
+  return { posts, loading, addPost, editPost, removePost };
+}
+
+export function usePostComments(postId: string) {
+  const [comments, setComments] = useState<PostComment[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!postId) return;
+    const q = query(
+      collection(db, 'post_comments'),
+      where('postId', '==', postId),
+      orderBy('createdAt', 'desc')
+    );
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const items = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as PostComment[];
+      setComments(items);
+      setLoading(false);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, 'post_comments');
+    });
+
+    return () => unsubscribe();
+  }, [postId]);
+
+  const addComment = async (comment: Omit<PostComment, 'id' | 'createdAt' | 'status'>) => {
+    try {
+      await addDoc(collection(db, 'post_comments'), {
+        ...comment,
+        status: 'pending',
+        createdAt: new Date().toISOString()
+      });
+    } catch (error) {
+      handleFirestoreError(error, OperationType.CREATE, 'post_comments');
+    }
+  };
+
+  const approveComment = async (id: string) => {
+    try {
+      await updateDoc(doc(db, 'post_comments', id), { status: 'approved' });
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `post_comments/${id}`);
+    }
+  };
+
+  const deleteComment = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, 'post_comments', id));
+    } catch (error) {
+      handleFirestoreError(error, OperationType.DELETE, `post_comments/${id}`);
+    }
+  };
+
+  return { comments, loading, addComment, approveComment, deleteComment };
+}
+
+export function useAllPostComments() {
+  const [comments, setComments] = useState<PostComment[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const q = query(collection(db, 'post_comments'), orderBy('createdAt', 'desc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const items = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as PostComment[];
+      setComments(items);
+      setLoading(false);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, 'post_comments');
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const approveComment = async (id: string) => {
+    try {
+      await updateDoc(doc(db, 'post_comments', id), { status: 'approved' });
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `post_comments/${id}`);
+    }
+  };
+
+  const markSpam = async (id: string) => {
+    try {
+      await updateDoc(doc(db, 'post_comments', id), { status: 'spam' });
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `post_comments/${id}`);
+    }
+  };
+
+  const deleteComment = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, 'post_comments', id));
+    } catch (error) {
+      handleFirestoreError(error, OperationType.DELETE, `post_comments/${id}`);
+    }
+  };
+
+  return { comments, loading, approveComment, markSpam, deleteComment };
 }

@@ -98,6 +98,43 @@
         "order": { "type": "number" }
       },
       "required": ["name", "slug", "order"]
+    },
+    "Post": {
+      "title": "Post",
+      "description": "Technology news post",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "slug": { "type": "string" },
+        "content": { "type": "string" },
+        "excerpt": { "type": "string" },
+        "thumbnail": { "type": "string" },
+        "category": { "type": "string" },
+        "authorId": { "type": "string" },
+        "authorName": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "views": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "slug", "content", "authorId"]
+    },
+    "PostComment": {
+      "title": "PostComment",
+      "description": "Comment on a news post",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "postId": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "userPhoto": { "type": "string" },
+        "content": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "approved", "spam"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["postId", "userId", "content", "status"]
     }
   },
   "firestore": {
@@ -120,6 +157,14 @@
     "/reviews/{reviewId}": {
       "schema": "Review",
       "description": "Collection of product reviews"
+    },
+    "/posts/{postId}": {
+      "schema": "Post",
+      "description": "Collection of technology news posts"
+    },
+    "/post_comments/{commentId}": {
+      "schema": "PostComment",
+      "description": "Collection of post comments"
     },
     "/consultations/{consultationId}": {
       "schema": {

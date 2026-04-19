@@ -42,3 +42,33 @@ export interface Product {
 export interface CartItem extends Product {
   quantity: number;
 }
+
+export interface Post {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  excerpt: string;
+  thumbnail: string;
+  category: string;
+  authorId: string;
+  authorName: string;
+  createdAt: any;
+  updatedAt: any;
+  views: number;
+  tags: string[];
+  seoTitle?: string;
+  seoDescription?: string;
+  seoKeywords?: string;
+}
+
+export interface PostComment {
+  id: string;
+  postId: string;
+  userId: string;
+  userName: string;
+  userPhoto: string;
+  content: string;
+  createdAt: any;
+  status: 'pending' | 'approved' | 'spam';
+}

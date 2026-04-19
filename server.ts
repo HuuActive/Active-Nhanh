@@ -47,6 +47,10 @@ async function startServer() {
     const productSlugMatch = url.match(/\/san-pham\/([a-zA-Z0-9_-]+)/);
     const productSlug = productSlugMatch ? productSlugMatch[1] : null;
 
+    // Check if the path is /tin-cong-nghe/:slug
+    const postSlugMatch = url.match(/\/tin-cong-nghe\/([a-zA-Z0-9_-]+)/);
+    const postSlug = postSlugMatch ? postSlugMatch[1] : null;
+
     try {
       let templatePath = '';
       if (process.env.NODE_ENV !== 'production') {
@@ -95,7 +99,26 @@ async function startServer() {
         } catch (error) {
           console.error('Error fetching product for metadata:', error);
         }
+      } else if (postSlug) {
+        try {
+          const postsRef = collection(db, 'posts');
+          const q = query(postsRef, where('slug', '==', postSlug), limit(1));
+          const querySnapshot = await getDocs(q);
+          if (!querySnapshot.empty) {
+            const postData = querySnapshot.docs[0].data();
+            title = postData.seoTitle || `${postData.title} - Tin Công Nghệ - ActiveNhanh`;
+            description = postData.seoDescription || postData.excerpt || postData.content.substring(0, 160);
+            image = postData.thumbnail || image;
+            console.log(`Setting metadata for post: ${postData.title}`);
+          }
+        } catch (error) {
+          console.error('Error fetching post for metadata:', error);
+        }
+      } else if (url === '/tin-cong-nghe') {
+        title = "Tin Công Nghệ - ActiveNhanh";
+        description = "Cập nhật những thông tin công nghệ mới nhất, thủ tục và mẹo sử dụng các dịch vụ số tại ActiveNhanh.";
       }
+
 
       // Replace placeholders
       const html = template

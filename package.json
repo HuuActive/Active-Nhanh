@@ -26,6 +26,8 @@
     "react-markdown": "^10.1.0",
     "react-virtualized-auto-sizer": "^2.0.3",
     "react-window": "^2.2.7",
+    "remark-breaks": "^4.0.0",
+    "remark-gfm": "^4.0.1",
     "vite": "^8.0.8"
   },
   "devDependencies": {

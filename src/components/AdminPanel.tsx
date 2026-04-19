@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Plus, Edit2, Trash2, Save, Loader2, Upload, Search, Info, Package, Shield, HelpCircle, Layout, Eye, Zap, ShoppingBag, CheckCircle, Clock, AlertCircle, User, Users, Tag, Star } from 'lucide-react';
-import { useProducts, useOrders, useUsers, useCategories, useReviews } from '../hooks/useFirebase';
-import { Product, Category } from '../types';
+import { X, Plus, Edit2, Trash2, Save, Loader2, Upload, Search, Info, Package, Shield, HelpCircle, Layout, Eye, Zap, ShoppingBag, CheckCircle, Clock, AlertCircle, User, Users, Tag, Star, FileText, MessageCircle, ShieldAlert, FileEdit, Eye as EyeIcon } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
+import { useProducts, useOrders, useUsers, useCategories, useReviews, usePosts, useAllPostComments, useAuth } from '../hooks/useFirebase';
+import { Product, Category, Post, PostComment } from '../types';
 import { formatPrice, createSlug } from '../lib/utils';
 
 interface AdminPanelProps {
@@ -17,10 +20,33 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
   const { categories, loading: categoriesLoading, addCategory, editCategory, removeCategory } = useCategories();
   const [showPendingOnly, setShowPendingOnly] = useState(false);
   const { reviews: allReviews, loading: reviewsLoading, hasMore: hasMoreReviews, loadMore: loadMoreReviews, approveReview, deleteReview: removeReview } = useReviews(undefined, showPendingOnly, 20);
+  const { user } = useAuth();
+  const { posts, loading: postsLoading, addPost, editPost, removePost } = usePosts();
+  const { comments: postComments, loading: postCommentsLoading, approveComment: approvePostComment, markSpam: markPostCommentSpam, deleteComment: removePostComment } = useAllPostComments();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
-  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'users' | 'categories' | 'reviews'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'users' | 'categories' | 'reviews' | 'posts' | 'comments'>('products');
   const [formTab, setFormTab] = useState<'basic' | 'detail' | 'seo'>('basic');
+  
+  // Post management state
+  const [editingPostId, setEditingPostId] = useState<string | null>(null);
+  const [isAddingPost, setIsAddingPost] = useState(false);
+  const [postEditorTab, setPostEditorTab] = useState<'write' | 'preview'>('write');
+  const [postFormData, setPostFormData] = useState<Omit<Post, 'id' | 'createdAt' | 'updatedAt' | 'views'>>({
+    title: '',
+    slug: '',
+    content: '',
+    excerpt: '',
+    thumbnail: 'https://picsum.photos/seed/tech/1200/630',
+    category: 'Thủ thuật',
+    authorId: '',
+    authorName: '',
+    tags: [],
+    seoTitle: '',
+    seoDescription: '',
+    seoKeywords: ''
+  });
+  const [postTagInput, setPostTagInput] = useState('');
   
   // Orders filter/search state
   const [orderSearch, setOrderSearch] = useState('');
@@ -185,6 +211,40 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
     });
   };
 
+  const resetPostForm = () => {
+    setPostEditorTab('write');
+    setPostFormData({
+      title: '',
+      slug: '',
+      content: '',
+      excerpt: '',
+      thumbnail: 'https://picsum.photos/seed/tech/1200/630',
+      category: 'Thủ thuật',
+      authorId: user?.uid || '',
+      authorName: user?.displayName || 'Admin',
+      tags: [],
+      seoTitle: '',
+      seoDescription: '',
+      seoKeywords: ''
+    });
+    setPostTagInput('');
+  };
+
+  const handlePostImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 800000) {
+        alert('Hình ảnh quá lớn. Vui lòng chọn ảnh dưới 800KB.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPostFormData({ ...postFormData, thumbnail: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -218,6 +278,23 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
                 {orders.filter(o => o.status === 'pending').length > 0 && (
                   <span className="flex h-5 w-5 items-center justify-center rounded-full bg-tiktok-magenta text-[10px] text-white">
                     {orders.filter(o => o.status === 'pending').length}
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => setActiveTab('posts')}
+                className={`flex flex-shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs sm:text-sm font-bold transition-all ${activeTab === 'posts' ? 'bg-white text-tiktok-black shadow-sm' : 'text-brand-400 hover:text-tiktok-black'}`}
+              >
+                <FileText className="h-4 w-4" /> Bài viết
+              </button>
+              <button
+                onClick={() => setActiveTab('comments')}
+                className={`flex flex-shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs sm:text-sm font-bold transition-all ${activeTab === 'comments' ? 'bg-white text-tiktok-black shadow-sm' : 'text-brand-400 hover:text-tiktok-black'}`}
+              >
+                <MessageCircle className="h-4 w-4" /> Blog
+                {postComments.filter(c => c.status === 'pending').length > 0 && (
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-tiktok-magenta text-[10px] text-white">
+                    {postComments.filter(c => c.status === 'pending').length}
                   </span>
                 )}
               </button>
@@ -985,6 +1062,302 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
                       ))}
                     </div>
                   )}
+                </div>
+              )}
+            </div>
+          ) : activeTab === 'posts' ? (
+            <div className="grid h-full lg:grid-cols-2">
+              {/* Post List */}
+              <div className="overflow-y-auto border-r border-brand-100 p-6">
+                <div className="mb-6 flex items-center justify-between">
+                  <h3 className="font-sans text-lg font-black text-tiktok-black">Quản lý bài viết</h3>
+                  <button 
+                    onClick={() => { setIsAddingPost(true); setEditingPostId(null); resetPostForm(); }}
+                    className="flex items-center gap-2 rounded-full bg-tiktok-cyan px-4 py-2 text-xs font-bold text-tiktok-black"
+                  >
+                    <Plus className="h-4 w-4" /> Thêm bài mới
+                  </button>
+                </div>
+
+                {postsLoading ? (
+                  <div className="flex h-40 items-center justify-center">
+                    <Loader2 className="h-8 w-8 animate-spin text-tiktok-cyan" />
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {posts.map((p) => (
+                      <div key={p.id} className="flex items-center gap-4 rounded-xl border border-brand-100 p-3 transition-colors hover:bg-brand-50">
+                        <img src={p.thumbnail} alt="" className="h-12 w-12 rounded-lg object-cover" />
+                        <div className="flex-1 overflow-hidden">
+                          <h4 className="truncate font-bold text-tiktok-black">{p.title}</h4>
+                          <div className="flex items-center gap-2 text-[10px] font-bold text-brand-400">
+                             <span>{p.category}</span>
+                             <span>• {new Date(p.createdAt).toLocaleDateString('vi-VN')}</span>
+                             <span>• Views: {p.views}</span>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <button 
+                            onClick={() => {
+                              setEditingPostId(p.id);
+                              setIsAddingPost(false);
+                              setPostFormData({
+                                title: p.title,
+                                slug: p.slug,
+                                content: p.content,
+                                excerpt: p.excerpt,
+                                thumbnail: p.thumbnail,
+                                category: p.category,
+                                authorId: p.authorId,
+                                authorName: p.authorName,
+                                tags: p.tags || [],
+                                seoTitle: p.seoTitle || '',
+                                seoDescription: p.seoDescription || '',
+                                seoKeywords: p.seoKeywords || ''
+                              });
+                            }} 
+                            className="rounded-lg p-2 text-brand-400 hover:bg-white hover:text-tiktok-cyan"
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </button>
+                          <button onClick={() => removePost(p.id)} className="rounded-lg p-2 text-brand-400 hover:bg-white hover:text-tiktok-magenta">
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Post Editor */}
+              <div className="overflow-y-auto p-6 bg-brand-50/30">
+                {(editingPostId || isAddingPost) ? (
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-bold text-tiktok-black">
+                        {editingPostId ? 'Chỉnh sửa bài viết' : 'Viết bài mới'}
+                      </h3>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div>
+                        <label className="mb-2 block text-xs font-black uppercase text-brand-400">Tiêu đề bài viết</label>
+                        <input
+                          type="text"
+                          value={postFormData.title}
+                          onChange={(e) => {
+                             const title = e.target.value;
+                             setPostFormData({ 
+                               ...postFormData, 
+                               title, 
+                               slug: editingPostId ? postFormData.slug : createSlug(title) 
+                             });
+                          }}
+                          className="w-full rounded-xl border border-brand-100 p-3 text-sm focus:border-tiktok-cyan focus:outline-none"
+                          placeholder="Ví dụ: 10 thủ thuật tối ưu Youtube Premium"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="mb-2 block text-xs font-black uppercase text-brand-400">Đường dẫn bài viết (Slug)</label>
+                          <input
+                            type="text"
+                            value={postFormData.slug}
+                            onChange={(e) => setPostFormData({ ...postFormData, slug: e.target.value })}
+                            className="w-full rounded-xl border border-brand-100 p-3 text-sm focus:border-tiktok-cyan focus:outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="mb-2 block text-xs font-black uppercase text-brand-400">Chuyên mục</label>
+                          <select
+                            value={postFormData.category}
+                            onChange={(e) => setPostFormData({ ...postFormData, category: e.target.value })}
+                            className="w-full rounded-xl border border-brand-100 p-3 text-sm focus:border-tiktok-cyan focus:outline-none"
+                          >
+                            <option value="Thủ thuật">Thủ thuật</option>
+                            <option value="Review">Review</option>
+                            <option value="Tin tức">Tin tức</option>
+                            <option value="Khuyến mãi">Khuyến mãi</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="mb-2 block text-xs font-black uppercase text-brand-400">Mô tả ngắn</label>
+                        <textarea
+                          value={postFormData.excerpt}
+                          onChange={(e) => setPostFormData({ ...postFormData, excerpt: e.target.value })}
+                          className="h-20 w-full rounded-xl border border-brand-100 p-3 text-sm focus:border-tiktok-cyan focus:outline-none"
+                          placeholder="Mô tả tóm tắt nội dung bài viết..."
+                        />
+                      </div>
+
+                      <div>
+                        <label className="mb-2 block text-xs font-black uppercase text-brand-400">Ảnh bìa</label>
+                        <div className="flex items-center gap-4">
+                          <img src={postFormData.thumbnail} alt="" className="h-24 w-40 rounded-xl object-cover border border-brand-100" />
+                          <label className="flex cursor-pointer items-center gap-2 rounded-xl bg-white px-4 py-2 text-xs font-bold text-brand-600 shadow-sm transition-all hover:bg-brand-50">
+                            <Upload className="h-4 w-4" /> Tải ảnh lên
+                            <input type="file" accept="image/*" className="hidden" onChange={handlePostImageUpload} />
+                          </label>
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="mb-2 flex items-center justify-between">
+                          <label className="block text-xs font-black uppercase text-brand-400">Nội dung (Markdown)</label>
+                          <div className="flex rounded-lg bg-brand-100 p-1">
+                            <button
+                              onClick={() => setPostEditorTab('write')}
+                              className={`flex items-center gap-1.5 rounded-md px-3 py-1 text-[10px] font-bold transition-all ${postEditorTab === 'write' ? 'bg-white shadow-sm' : 'text-brand-400'}`}
+                            >
+                              <FileEdit className="h-3 w-3" /> Soạn thảo
+                            </button>
+                            <button
+                              onClick={() => setPostEditorTab('preview')}
+                              className={`flex items-center gap-1.5 rounded-md px-3 py-1 text-[10px] font-bold transition-all ${postEditorTab === 'preview' ? 'bg-white shadow-sm' : 'text-brand-400'}`}
+                            >
+                              <EyeIcon className="h-3 w-3" /> Xem trước
+                            </button>
+                          </div>
+                        </div>
+                        
+                        {postEditorTab === 'write' ? (
+                          <textarea
+                            value={postFormData.content}
+                            onChange={(e) => setPostFormData({ ...postFormData, content: e.target.value })}
+                            className="h-96 w-full rounded-xl border border-brand-100 p-4 text-sm font-mono focus:border-tiktok-cyan focus:outline-none"
+                            placeholder="Hỗ trợ định dạng Markdown..."
+                          />
+                        ) : (
+                          <div className="markdown-body h-96 w-full overflow-y-auto rounded-xl border border-brand-100 bg-white p-6">
+                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
+                              {postFormData.content || '*Chưa có nội dung...*'}
+                            </ReactMarkdown>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="pt-4 border-t border-brand-100">
+                        <label className="mb-2 block text-xs font-black uppercase text-brand-400">SEO Metadata</label>
+                        <div className="space-y-3">
+                           <input
+                            type="text"
+                            placeholder="SEO Title"
+                            value={postFormData.seoTitle}
+                            onChange={(e) => setPostFormData({ ...postFormData, seoTitle: e.target.value })}
+                            className="w-full rounded-xl border border-brand-100 p-3 text-sm focus:border-tiktok-cyan focus:outline-none"
+                          />
+                          <textarea
+                            placeholder="SEO Description"
+                            value={postFormData.seoDescription}
+                            onChange={(e) => setPostFormData({ ...postFormData, seoDescription: e.target.value })}
+                            className="h-20 w-full rounded-xl border border-brand-100 p-3 text-sm focus:border-tiktok-cyan focus:outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex gap-3 pt-4">
+                        <button
+                          onClick={async () => {
+                            if (editingPostId) {
+                              await editPost(editingPostId, postFormData);
+                              setEditingPostId(null);
+                            } else {
+                              await addPost(postFormData);
+                              setIsAddingPost(false);
+                            }
+                            resetPostForm();
+                          }}
+                          className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-tiktok-black py-3 font-bold text-white shadow-lg transition-all hover:bg-tiktok-magenta"
+                        >
+                          <Save className="h-4 w-4" /> Lưu bài viết
+                        </button>
+                        <button
+                          onClick={() => { setEditingPostId(null); setIsAddingPost(false); resetPostForm(); }}
+                          className="rounded-xl border border-brand-100 px-6 font-bold text-brand-400 hover:bg-white"
+                        >
+                          Hủy
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex h-full flex-col items-center justify-center text-center">
+                    <div className="mb-6 rounded-full bg-white p-6 shadow-xl">
+                      <FileText className="h-12 w-12 text-brand-100" />
+                    </div>
+                    <p className="font-bold text-brand-400">Chọn bài viết để chỉnh sửa hoặc viết bài mới</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : activeTab === 'comments' ? (
+            <div className="h-full overflow-y-auto p-6 bg-brand-50/30">
+               {postCommentsLoading ? (
+                <div className="flex h-64 items-center justify-center">
+                  <Loader2 className="h-8 w-8 animate-spin text-tiktok-cyan" />
+                </div>
+              ) : (
+                <div className="mx-auto max-w-4xl space-y-6">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-black text-tiktok-black">Duyệt bình luận Blog ({postComments.length})</h3>
+                  </div>
+
+                  <div className="space-y-4">
+                    {postComments.length === 0 ? (
+                      <div className="flex h-64 flex-col items-center justify-center text-center bg-white rounded-3xl border border-brand-100">
+                        <MessageCircle className="mb-4 h-12 w-12 text-brand-200" />
+                        <p className="font-bold text-brand-400">Chưa có bình luận nào</p>
+                      </div>
+                    ) : (
+                      postComments.map((comment) => (
+                        <div key={comment.id} className={`rounded-3xl border p-6 bg-white shadow-sm transition-all ${comment.status === 'pending' ? 'border-yellow-200 ring-2 ring-yellow-50' : 'border-brand-100'}`}>
+                           <div className="flex items-start justify-between">
+                             <div className="flex gap-4">
+                               <img src={comment.userPhoto} alt="" className="h-10 w-10 rounded-full border border-brand-50 shadow-sm" />
+                               <div>
+                                 <div className="flex items-center gap-2 mb-1">
+                                   <span className="font-black text-tiktok-black">{comment.userName}</span>
+                                   <span className="text-[10px] font-bold text-brand-400">{new Date(comment.createdAt).toLocaleString('vi-VN')}</span>
+                                   {comment.status === 'pending' && <span className="bg-yellow-500 text-white text-[8px] px-1.5 py-0.5 rounded-full font-black uppercase tracking-widest">Chờ duyệt</span>}
+                                   {comment.status === 'spam' && <span className="bg-red-500 text-white text-[8px] px-1.5 py-0.5 rounded-full font-black uppercase tracking-widest">Spam</span>}
+                                 </div>
+                                 <p className="text-sm text-brand-600 mb-4 bg-brand-50/50 p-3 rounded-xl italic">"{comment.content}"</p>
+                                 <div className="text-[10px] text-brand-400 font-bold">
+                                   Bài viết: <span className="text-tiktok-cyan uppercase">{posts.find(p => p.id === comment.postId)?.title || 'N/A'}</span>
+                                 </div>
+                               </div>
+                             </div>
+                             <div className="flex flex-col gap-2">
+                               {comment.status === 'pending' && (
+                                 <button 
+                                   onClick={() => approvePostComment(comment.id)}
+                                   className="flex items-center justify-center gap-2 bg-green-500 text-white px-4 py-2 rounded-xl text-xs font-black shadow-lg shadow-green-500/20 hover:bg-green-600 transition-all"
+                                 >
+                                   <CheckCircle className="h-3.5 w-3.5" /> Duyệt
+                                 </button>
+                               )}
+                               <button 
+                                 onClick={() => markPostCommentSpam(comment.id)}
+                                 className="flex items-center justify-center gap-2 bg-red-50 text-red-500 px-4 py-2 rounded-xl text-xs font-black hover:bg-red-100 transition-all underline underline-offset-4"
+                               >
+                                 <ShieldAlert className="h-3.5 w-3.5" /> Spam
+                               </button>
+                               <button 
+                                 onClick={() => removePostComment(comment.id)}
+                                 className="flex items-center justify-center gap-2 text-brand-300 hover:text-tiktok-magenta transition-all"
+                               >
+                                 <Trash2 className="h-4 w-4" />
+                               </button>
+                             </div>
+                           </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
                 </div>
               )}
             </div>

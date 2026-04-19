@@ -20,6 +20,8 @@ import Footer from './components/Footer';
 import AdminPanel from './components/AdminPanel';
 import RecentlyViewed from './components/RecentlyViewed';
 import ProductDetail from './components/ProductDetail';
+import NewsPage from './components/NewsPage';
+import PostDetail from './components/PostDetail';
 import CheckoutModal from './components/CheckoutModal';
 import MyOrdersModal from './components/MyOrdersModal';
 import ContactModal from './components/ContactModal';
@@ -29,9 +31,9 @@ import PaymentGuideModal from './components/PaymentGuideModal';
 import GuideModal from './components/GuideModal';
 import LoginModal from './components/LoginModal';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import { useProducts, useAuth, useCategories, useReviews } from './hooks/useFirebase';
+import { useProducts, useAuth, useCategories, useReviews, usePosts } from './hooks/useFirebase';
 import { useRecentlyViewed } from './hooks/useRecentlyViewed';
-import { Product, CartItem, Category } from './types';
+import { Product, CartItem, Category, Post } from './types';
 
 const faqs = [
   {
@@ -85,6 +87,7 @@ const categoryIcons: Record<string, any> = {
 export default function App() {
   const { products, loading: productsLoading } = useProducts();
   const { categories: dbCategories } = useCategories();
+  const { posts, loading: postsLoading } = usePosts();
   const { reviews: generalReviews } = useReviews('general');
   const { isAdmin } = useAuth();
   const { recentlyViewed, addToRecentlyViewed } = useRecentlyViewed();
@@ -101,6 +104,8 @@ export default function App() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [currentView, setCurrentView] = useState<'home' | 'news'>('home');
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [priceRange, setPriceRange] = useState<[number, number | null]>([0, null]);
   const [minRating, setMinRating] = useState(0);
@@ -212,32 +217,83 @@ export default function App() {
     window.history.pushState({}, "", "/");
   };
 
+  const handleViewPost = (post: Post) => {
+    setSelectedPost(post);
+    setCurrentView('news');
+    const newUrl = `/tin-cong-nghe/${post.slug}`;
+    window.history.pushState({ postId: post.id }, "", newUrl);
+    window.scrollTo(0, 0);
+  };
+
+  const handleBackToNews = () => {
+    setSelectedPost(null);
+    window.history.pushState({}, "", "/tin-cong-nghe");
+    window.scrollTo(0, 0);
+  };
+
+  // Listen for custom login open event
+  useEffect(() => {
+    const handleOpenLogin = () => setIsLoginOpen(true);
+    window.addEventListener('openLogin', handleOpenLogin);
+    return () => window.removeEventListener('openLogin', handleOpenLogin);
+  }, []);
+
   // Handle Initial Load and Popstate for Routing
   useEffect(() => {
-    if (products.length === 0) return;
+    if (products.length === 0 && posts.length === 0) return;
 
     const handleRouting = () => {
       const path = window.location.pathname;
       const params = new URLSearchParams(window.location.search);
       const productId = params.get('product');
-      const slugMatch = path.match(/\/san-pham\/([a-zA-Z0-9_-]+)/);
-      const slug = slugMatch ? slugMatch[1] : null;
+      
+      // Product Slugs
+      const productSlugMatch = path.match(/\/san-pham\/([a-zA-Z0-9_-]+)/);
+      const productSlug = productSlugMatch ? productSlugMatch[1] : null;
 
-      if (slug) {
-        const product = products.find(p => p.slug === slug);
-        if (product) setSelectedProduct(product);
+      // Post Slugs
+      const postSlugMatch = path.match(/\/tin-cong-nghe\/([a-zA-Z0-9_-]+)/);
+      const postSlug = postSlugMatch ? postSlugMatch[1] : null;
+
+      if (postSlug) {
+        const post = posts.find(p => p.slug === postSlug);
+        if (post) {
+          setSelectedPost(post);
+          setCurrentView('news');
+        } else {
+          setCurrentView('news');
+          setSelectedPost(null);
+        }
+        setSelectedProduct(null);
+      } else if (path === '/tin-cong-nghe') {
+        setCurrentView('news');
+        setSelectedPost(null);
+        setSelectedProduct(null);
+      } else if (productSlug) {
+        const product = products.find(p => p.slug === productSlug);
+        if (product) {
+          setSelectedProduct(product);
+          setCurrentView('home');
+        }
+        setSelectedPost(null);
       } else if (productId) {
         const product = products.find(p => p.id === productId);
-        if (product) setSelectedProduct(product);
+        if (product) {
+          setSelectedProduct(product);
+          setCurrentView('home');
+        }
+        setSelectedPost(null);
       } else {
         setSelectedProduct(null);
+        setSelectedPost(null);
+        setCurrentView('home');
       }
     };
 
     handleRouting();
     window.addEventListener('popstate', handleRouting);
     return () => window.removeEventListener('popstate', handleRouting);
-  }, [products]);
+  }, [products, posts]);
 
   return (
     <ErrorBoundary>
@@ -255,9 +311,11 @@ export default function App() {
         />
         
         <main>
-          <Hero />
+          {currentView === 'home' ? (
+            <>
+              <Hero />
 
-          {/* Products Section */}
+              {/* Products Section */}
           <section id="products" className="py-12 lg:py-24">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="mb-8 lg:mb-12 flex flex-col items-center text-center gap-4">
@@ -612,6 +670,19 @@ export default function App() {
               </div>
             </div>
           </section>
+          </>
+          ) : selectedPost ? (
+            <PostDetail 
+              post={selectedPost} 
+              onBack={handleBackToNews} 
+            />
+          ) : (
+            <NewsPage 
+              posts={posts} 
+              onViewPost={handleViewPost} 
+              loading={postsLoading} 
+            />
+          )}
         </main>
 
         <Footer 

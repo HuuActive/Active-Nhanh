@@ -1,4 +1,4 @@
-import { ShoppingBag, Search, User, Menu, Zap, LogOut, Settings, ChevronDown, Package, Shield, X, Headphones, ShoppingCart } from 'lucide-react';
+import { ShoppingBag, Search, User, Menu, Zap, LogOut, Settings, ChevronDown, Package, Shield, X, Headphones, ShoppingCart, Layout } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useAuth } from '../hooks/useFirebase';
@@ -70,13 +70,18 @@ export default function Header({
           </div>
 
           <nav className="hidden lg:flex lg:gap-8">
-            {['Sản phẩm', 'Bảng giá', 'Hướng dẫn', 'Liên hệ'].map((item) => (
+            {['Sản phẩm', 'Tin công nghệ', 'Bảng giá', 'Hướng dẫn', 'Liên hệ'].map((item) => (
               <button
                 key={item}
                 onClick={() => {
                   if (item === 'Liên hệ') onContactClick();
                   else if (item === 'Hướng dẫn') onGuideClick();
                   else if (item === 'Sản phẩm') window.scrollTo({ top: 800, behavior: 'smooth' });
+                  else if (item === 'Tin công nghệ') {
+                    window.history.pushState({}, '', '/tin-cong-nghe');
+                    window.dispatchEvent(new PopStateEvent('popstate'));
+                  }
+                  else if (item === 'Bảng giá') window.scrollTo({ top: 1200, behavior: 'smooth' });
                 }}
                 className="text-[13px] lg:text-sm font-semibold text-brand-600 transition-all hover:text-tiktok-black hover:underline decoration-tiktok-cyan decoration-2 underline-offset-4"
               >
@@ -250,6 +255,10 @@ export default function Header({
                   { name: 'Sản phẩm', icon: Package, action: () => {
                     const productsSection = document.getElementById('products');
                     if (productsSection) productsSection.scrollIntoView({ behavior: 'smooth' });
+                  }},
+                  { name: 'Tin công nghệ', icon: Layout, action: () => {
+                    window.history.pushState({}, '', '/tin-cong-nghe');
+                    window.dispatchEvent(new PopStateEvent('popstate'));
                   }},
                   { name: 'Hướng dẫn', icon: Search, action: onGuideClick },
                   { name: 'Liên hệ', icon: Headphones, action: onContactClick }
