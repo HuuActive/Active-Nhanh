@@ -3,6 +3,7 @@ import { X, ShoppingCart, Star, ShieldCheck, Zap, MessageCircle, Info, Package, 
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
+import SEO from './SEO';
 import { useState } from 'react';
 import emailjs from '@emailjs/browser';
 import { Product } from '../types';
@@ -18,7 +19,7 @@ interface ProductDetailProps {
 
 export default function ProductDetail({ product, isOpen, onClose, onAddToCart }: ProductDetailProps) {
   const [activeTab, setActiveTab] = useState<'description' | 'guide' | 'terms'>('description');
-  const { user, isAdmin } = useAuth();
+  const { user, profile, isAdmin } = useAuth();
   const { reviews, hasMore: hasMoreReviews, loadMore: loadMoreReviews, addReview, addReply, deleteReview, addConsultationRequest } = useReviews(product?.id || '', true, 5);
   const [newReview, setNewReview] = useState({ userName: '', rating: 5, comment: '' });
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
@@ -64,7 +65,7 @@ export default function ProductDetail({ product, isOpen, onClose, onAddToCart }:
         productName: product.name,
         contact: consultationForm.contact,
         userId: user?.uid || 'anonymous',
-        userName: user?.displayName || 'Khách vãng lai'
+        userName: profile?.displayName || user?.displayName || 'Khách vãng lai'
       });
 
       // ... existing EmailJS logic ...
@@ -163,8 +164,8 @@ export default function ProductDetail({ product, isOpen, onClose, onAddToCart }:
 
     await addReview({
       productId: product.id,
-      userName: user?.displayName || newReview.userName,
-      userPhoto: user?.photoURL || '',
+      userName: profile?.displayName || user?.displayName || newReview.userName,
+      userPhoto: profile?.photoURL || user?.photoURL || '',
       userId: user?.uid || 'anonymous',
       rating: newReview.rating,
       comment: newReview.comment
@@ -178,8 +179,8 @@ export default function ProductDetail({ product, isOpen, onClose, onAddToCart }:
   const handleReply = async (reviewId: string) => {
     if (!replyText) return;
     await addReply(reviewId, {
-      userName: user?.displayName || 'Admin',
-      userPhoto: user?.photoURL || '',
+      userName: profile?.displayName || user?.displayName || 'Admin',
+      userPhoto: profile?.photoURL || user?.photoURL || '',
       userId: user?.uid,
       comment: replyText,
       isAdmin: isAdmin
@@ -188,10 +189,45 @@ export default function ProductDetail({ product, isOpen, onClose, onAddToCart }:
     setReplyingTo(null);
   };
 
+  const productSchema = product ? {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": product.name,
+    "image": [product.image],
+    "description": product.seoDescription || product.description,
+    "brand": {
+      "@type": "Brand",
+      "name": "ActiveNhanh"
+    },
+    "offers": {
+      "@type": "Offer",
+      "url": window.location.href,
+      "priceCurrency": "VND",
+      "price": product.price,
+      "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": product.rating,
+      "reviewCount": product.reviews
+    }
+  } : null;
+
   return (
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+          {product && (
+            <SEO 
+              title={product.seoTitle || product.name}
+              description={product.seoDescription || product.description.substring(0, 160)}
+              keywords={product.seoKeywords}
+              image={product.image}
+              url={window.location.href}
+              type="product"
+              schema={productSchema}
+            />
+          )}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -768,8 +804,8 @@ export default function ProductDetail({ product, isOpen, onClose, onAddToCart }:
                                 </div>
                               )}
 
-                              {/* Admin Reply Form */}
-                              {isAdmin && (
+                              {/* Reply Form */}
+                              {user && (
                                 <div className="mt-6">
                                   {replyingTo === review.id ? (
                                     <div className="flex gap-2">
@@ -782,7 +818,8 @@ export default function ProductDetail({ product, isOpen, onClose, onAddToCart }:
                                       />
                                       <button
                                         onClick={() => handleReply(review.id)}
-                                        className="rounded-xl bg-tiktok-cyan px-4 py-2 text-xs font-bold text-white transition-all hover:opacity-90"
+                                        disabled={!replyText.trim()}
+                                        className="rounded-xl bg-tiktok-cyan px-4 py-2 text-xs font-bold text-white transition-all hover:opacity-90 disabled:opacity-50"
                                       >
                                         Gửi
                                       </button>
@@ -798,7 +835,7 @@ export default function ProductDetail({ product, isOpen, onClose, onAddToCart }:
                                       onClick={() => setReplyingTo(review.id)}
                                       className="flex items-center gap-2 text-xs font-bold text-tiktok-cyan hover:underline"
                                     >
-                                      <Reply className="h-3 w-3" /> Trả lời khách hàng
+                                      <Reply className="h-3 w-3" /> Trả lời đánh giá
                                     </button>
                                   )}
                                 </div>

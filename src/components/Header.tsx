@@ -11,6 +11,7 @@ interface HeaderProps {
   onContactClick: () => void;
   onGuideClick: () => void;
   onLoginClick: () => void;
+  onProfileClick: () => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
 }
@@ -23,10 +24,11 @@ export default function Header({
   onContactClick,
   onGuideClick,
   onLoginClick,
+  onProfileClick,
   searchQuery,
   onSearchChange
 }: HeaderProps) {
-  const { user, isAdmin, logout } = useAuth();
+  const { user, profile, isAdmin, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
@@ -138,7 +140,7 @@ export default function Header({
                   className="flex items-center gap-2 rounded-full border border-brand-100 bg-brand-50 p-1 pr-3 transition-all hover:border-tiktok-cyan"
                 >
                   <img 
-                    src={user.photoURL || ''} 
+                    src={profile?.photoURL || user.photoURL || ''} 
                     alt="" 
                     className="h-8 w-8 rounded-full border border-white shadow-sm"
                   />
@@ -154,10 +156,17 @@ export default function Header({
                       className="absolute right-0 mt-2 w-64 overflow-hidden rounded-2xl border border-brand-100 bg-white shadow-xl hidden lg:block z-[80]"
                     >
                       <div className="border-b border-brand-50 bg-brand-50/50 p-4">
-                        <p className="text-sm font-black text-tiktok-black truncate">{user.displayName}</p>
+                        <p className="text-sm font-black text-tiktok-black truncate">{profile?.displayName || user.displayName}</p>
                         <p className="text-xs font-medium text-brand-400 truncate">{user.email}</p>
                       </div>
                       <div className="p-2">
+                        <button 
+                          onClick={() => { setIsUserMenuOpen(false); onProfileClick(); }}
+                          className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-bold text-tiktok-black transition-colors hover:bg-brand-50"
+                        >
+                          <Settings className="h-4 w-4 text-brand-400" /> Tài khoản của tôi
+                        </button>
+
                         <button 
                           onClick={() => { setIsUserMenuOpen(false); onMyOrdersClick(); }}
                           className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-bold text-brand-600 transition-colors hover:bg-brand-50 hover:text-tiktok-black"
@@ -230,9 +239,9 @@ export default function Header({
                 
                 {user ? (
                   <div className="flex items-center gap-3">
-                    <img src={user.photoURL || ''} alt="" className="h-10 w-10 rounded-full border-2 border-tiktok-cyan" />
+                    <img src={profile?.photoURL || user.photoURL || ''} alt="" className="h-10 w-10 rounded-full border-2 border-tiktok-cyan" />
                     <div className="min-w-0">
-                      <p className="font-black truncate text-[13px]">{user.displayName}</p>
+                      <p className="font-black truncate text-[13px]">{profile?.displayName || user.displayName}</p>
                       <p className="text-[9px] font-bold text-brand-400 truncate opacity-70 uppercase tracking-widest">{isAdmin ? 'Quản trị viên' : 'Thành viên'}</p>
                     </div>
                   </div>
@@ -281,6 +290,13 @@ export default function Header({
                 
                 {user && (
                   <>
+                    <button 
+                      onClick={() => { setIsMobileMenuOpen(false); onProfileClick(); }}
+                      className="flex items-center gap-4 rounded-xl px-4 py-2.5 text-left font-bold text-tiktok-black transition-colors hover:bg-brand-50 text-[13px]"
+                    >
+                      <User className="h-4 w-4 text-brand-300" /> Tài khoản của tôi
+                    </button>
+                    
                     <button 
                       onClick={() => { setIsMobileMenuOpen(false); onMyOrdersClick(); }}
                       className="flex items-center gap-4 rounded-xl px-4 py-2.5 text-left font-bold text-tiktok-black transition-colors hover:bg-brand-50 text-[13px]"

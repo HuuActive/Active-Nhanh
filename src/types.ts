@@ -71,4 +71,14 @@ export interface PostComment {
   content: string;
   createdAt: any;
   status: 'pending' | 'approved' | 'spam';
+  replies?: CommentReply[];
+}
+
+export interface CommentReply {
+  userId?: string;
+  userName: string;
+  userPhoto: string;
+  content: string;
+  createdAt: any;
+  isAdmin?: boolean;
 }

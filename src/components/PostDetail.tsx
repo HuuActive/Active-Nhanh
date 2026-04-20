@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   ArrowLeft, Calendar, User, Eye, Share2, Facebook, Link as LinkIcon, 
-  MessageSquare, Send, ShieldAlert, CheckCircle2, ChevronRight, Tags
+  MessageSquare, Send, ShieldAlert, CheckCircle2, ChevronRight, Tags, Reply, Trash2
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
+import SEO from './SEO';
 import { Post, PostComment } from '../types';
 import { useAuth, usePostComments } from '../hooks/useFirebase';
 
@@ -16,11 +17,26 @@ interface PostDetailProps {
 }
 
 export default function PostDetail({ post, onBack }: PostDetailProps) {
-  const { user } = useAuth();
-  const { comments, loading: commentsLoading, addComment } = usePostComments(post.id);
+  const { user, profile, isAdmin } = useAuth();
+  const { comments, loading: commentsLoading, addComment, addReply, deleteComment } = usePostComments(post.id);
   const [commentContent, setCommentContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showShareTooltip, setShowShareTooltip] = useState(false);
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState('');
+
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": post.title,
+    "image": [post.thumbnail],
+    "datePublished": post.createdAt,
+    "dateModified": post.updatedAt,
+    "author": [{
+        "@type": "Person",
+        "name": post.authorName
+      }]
+  };
 
   const handleShare = (platform: 'facebook' | 'link') => {
     const url = window.location.href;
@@ -41,8 +57,8 @@ export default function PostDetail({ post, onBack }: PostDetailProps) {
       await addComment({
         postId: post.id,
         userId: user.uid,
-        userName: user.displayName || 'Khách hàng',
-        userPhoto: user.photoURL || '',
+        userName: profile?.displayName || user.displayName || 'Khách hàng',
+        userPhoto: profile?.photoURL || user.photoURL || '',
         content: commentContent.trim()
       });
       setCommentContent('');
@@ -54,10 +70,37 @@ export default function PostDetail({ post, onBack }: PostDetailProps) {
     }
   };
 
-  const approvedComments = comments.filter(c => c.status === 'approved');
+  const handlePostReply = async (commentId: string) => {
+    if (!user || !replyText.trim()) return;
+
+    try {
+      await addReply(commentId, {
+        userId: user.uid,
+        userName: profile?.displayName || user.displayName || 'Khách hàng',
+        userPhoto: profile?.photoURL || user.photoURL || '',
+        content: replyText.trim(),
+        isAdmin: isAdmin
+      });
+      setReplyText('');
+      setReplyingTo(null);
+    } catch (error) {
+      console.error('Error adding reply:', error);
+    }
+  };
+
+  const approvedComments = comments.filter(c => c.status === 'approved' || isAdmin);
 
   return (
     <div className="min-h-screen bg-white">
+      <SEO 
+        title={post.seoTitle || post.title}
+        description={post.seoDescription || post.excerpt}
+        keywords={post.seoKeywords}
+        image={post.thumbnail}
+        url={window.location.href}
+        type="article"
+        schema={articleSchema}
+      />
       {/* Article Header */}
       <div className="relative h-[50vh] md:h-[70vh] w-full overflow-hidden">
         <img
@@ -154,7 +197,7 @@ export default function PostDetail({ post, onBack }: PostDetailProps) {
             {user ? (
               <form onSubmit={handlePostComment} className="mb-12 bg-brand-50/50 rounded-3xl p-6 border border-brand-100">
                 <div className="flex items-start gap-4">
-                  <img src={user.photoURL || ''} alt="" className="h-10 w-10 rounded-full border border-white shadow-sm" />
+                  <img src={profile?.photoURL || user.photoURL || ''} alt="" className="h-10 w-10 rounded-full border border-white shadow-sm" />
                   <div className="flex-1">
                     <textarea
                       value={commentContent}
@@ -192,17 +235,89 @@ export default function PostDetail({ post, onBack }: PostDetailProps) {
               </div>
             )}
 
-            <div className="space-y-8">
+            <div className="space-y-12">
               {approvedComments.map(comment => (
-                <div key={comment.id} className="flex gap-4">
-                  <img src={comment.userPhoto} alt="" className="h-10 w-10 rounded-full border border-brand-50 shadow-sm shrink-0" />
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-1">
-                      <span className="font-black text-sm text-tiktok-black">{comment.userName}</span>
-                      <span className="text-[10px] font-bold text-brand-400">{new Date(comment.createdAt).toLocaleDateString('vi-VN')}</span>
-                    </div>
-                    <div className="bg-brand-50 rounded-2xl rounded-tl-none p-4 text-sm text-brand-700">
-                      {comment.content}
+                <div key={comment.id} className="group">
+                  <div className="flex gap-4">
+                    <img src={comment.userPhoto} alt="" className="h-10 w-10 rounded-full border border-brand-50 shadow-sm shrink-0" />
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-3">
+                          <span className="font-black text-sm text-tiktok-black">{comment.userName}</span>
+                          <span className="text-[10px] font-bold text-brand-400">{new Date(comment.createdAt).toLocaleDateString('vi-VN')}</span>
+                          {comment.status === 'pending' && (
+                            <span className="text-[10px] font-black text-tiktok-magenta uppercase">Đang chờ duyệt</span>
+                          )}
+                        </div>
+                        {isAdmin && (
+                          <button onClick={() => deleteComment(comment.id)} className="opacity-0 group-hover:opacity-100 transition-opacity text-brand-300 hover:text-red-500">
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        )}
+                      </div>
+                      <div className="bg-brand-50 rounded-2xl rounded-tl-none p-4 text-sm text-brand-700 mb-3">
+                        {comment.content}
+                      </div>
+                      
+                      {/* Sub-replies */}
+                      {comment.replies && comment.replies.length > 0 && (
+                        <div className="ml-4 pl-6 border-l-2 border-brand-100 space-y-4 mb-4">
+                          {comment.replies.map((reply, idx) => (
+                            <div key={idx} className="flex gap-3">
+                              <img src={reply.userPhoto} alt="" className="h-8 w-8 rounded-full border border-white shadow-sm shrink-0" />
+                              <div>
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className={`text-xs font-black ${reply.isAdmin ? 'text-tiktok-cyan' : 'text-tiktok-black'}`}>
+                                    {reply.userName} {reply.isAdmin && '(Quản trị viên)'}
+                                  </span>
+                                  <span className="text-[9px] font-bold text-brand-300">{new Date(reply.createdAt).toLocaleDateString('vi-VN')}</span>
+                                </div>
+                                <p className="text-xs text-brand-600 leading-relaxed">
+                                  {reply.content}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Reply Action */}
+                      {user && (
+                        <div className="ml-4">
+                          {replyingTo === comment.id ? (
+                            <div className="flex flex-col gap-3 p-4 bg-brand-50/50 rounded-2xl border border-brand-100">
+                              <textarea
+                                value={replyText}
+                                onChange={(e) => setReplyText(e.target.value)}
+                                placeholder="Nhập câu trả lời của bạn..."
+                                className="w-full rounded-xl border border-brand-100 bg-white p-3 text-xs focus:border-tiktok-cyan focus:outline-none min-h-[80px] resize-none"
+                              />
+                              <div className="flex justify-end gap-2">
+                                <button
+                                  onClick={() => setReplyingTo(null)}
+                                  className="px-4 py-2 rounded-lg text-[10px] font-bold text-brand-400 hover:text-brand-600 transition-colors"
+                                >
+                                  Hủy bỏ
+                                </button>
+                                <button
+                                  onClick={() => handlePostReply(comment.id)}
+                                  disabled={!replyText.trim()}
+                                  className="bg-tiktok-black text-white px-4 py-2 rounded-lg font-bold text-[10px] hover:bg-tiktok-magenta transition-all disabled:opacity-50"
+                                >
+                                  Trả lời
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => setReplyingTo(comment.id)}
+                              className="flex items-center gap-1.5 text-[10px] font-black text-brand-400 hover:text-tiktok-cyan transition-colors uppercase tracking-wider"
+                            >
+                              <Reply className="h-3 w-3" /> Trả lời
+                            </button>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

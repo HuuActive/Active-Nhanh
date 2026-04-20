@@ -1,6 +1,9 @@
-import { motion } from 'motion/react';
-import { Clock, Eye, ChevronRight, Search, Calendar, User } from 'lucide-react';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Clock, Eye, ChevronRight, Search, Calendar, User, Maximize2 } from 'lucide-react';
 import { Post } from '../types';
+import SEO from './SEO';
+import PostQuickViewModal from './PostQuickViewModal';
 
 interface NewsPageProps {
   posts: Post[];
@@ -9,6 +12,8 @@ interface NewsPageProps {
 }
 
 export default function NewsPage({ posts, onViewPost, loading }: NewsPageProps) {
+  const [quickViewPost, setQuickViewPost] = useState<Post | null>(null);
+
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
@@ -22,6 +27,11 @@ export default function NewsPage({ posts, onViewPost, loading }: NewsPageProps) 
 
   return (
     <div className="min-h-screen bg-[#f5f5f0] pb-20">
+      <SEO 
+        title="Tin Công Nghệ & Thủ Thuật"
+        description="Cập nhật tin tức công nghệ mới nhất, thủ thuật phần mềm, hướng dẫn nâng cấp tài khoản số Premium uy tín tại ActiveNhanh."
+        url={window.location.href}
+      />
       {/* Editorial Hero */}
       <section className="bg-tiktok-black pt-20 pb-40 text-white overflow-hidden relative">
         <div className="absolute inset-0 opacity-20 pointer-events-none">
@@ -81,6 +91,15 @@ export default function NewsPage({ posts, onViewPost, loading }: NewsPageProps) 
                     </div>
                     <span className="text-sm font-bold">{featuredPost.authorName}</span>
                   </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setQuickViewPost(featuredPost);
+                    }}
+                    className="ml-auto hidden md:flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md px-6 py-2.5 rounded-xl text-xs font-black transition-all border border-white/20"
+                  >
+                    <Maximize2 className="h-4 w-4" /> Xem nhanh
+                  </button>
                 </div>
               </div>
             </motion.div>
@@ -111,6 +130,18 @@ export default function NewsPage({ posts, onViewPost, loading }: NewsPageProps) 
                   <span className="bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-tiktok-black text-[10px] font-black uppercase tracking-wider shadow-sm">
                     {post.category}
                   </span>
+                </div>
+                {/* Quick View Button on Hover */}
+                <div className="absolute inset-0 bg-tiktok-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none group-active:scale-95 duration-300">
+                  <div 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setQuickViewPost(post);
+                    }}
+                    className="bg-white text-tiktok-black px-6 py-2.5 rounded-full font-black text-xs shadow-2xl pointer-events-auto hover:bg-tiktok-cyan transition-colors transform translate-y-4 group-hover:translate-y-0 duration-300 flex items-center gap-2"
+                  >
+                    <Maximize2 className="h-4 w-4" /> Xem nhanh
+                  </div>
                 </div>
               </div>
               
@@ -152,6 +183,19 @@ export default function NewsPage({ posts, onViewPost, loading }: NewsPageProps) 
           </div>
         )}
       </div>
+
+      <AnimatePresence>
+        {quickViewPost && (
+          <PostQuickViewModal 
+            post={quickViewPost}
+            onClose={() => setQuickViewPost(null)}
+            onReadMore={(post) => {
+              setQuickViewPost(null);
+              onViewPost(post);
+            }}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

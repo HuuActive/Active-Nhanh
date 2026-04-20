@@ -15,7 +15,9 @@ import {
   getDoc,
   setDoc,
   writeBatch,
-  increment
+  increment,
+  serverTimestamp,
+  Timestamp
 } from 'firebase/firestore';
 import { 
   GoogleAuthProvider, 
@@ -30,7 +32,18 @@ import {
   sendPasswordResetEmail
 } from 'firebase/auth';
 import { db, auth, handleFirestoreError, OperationType } from '../lib/firebase';
-import { Product, Category, Post, PostComment } from '../types';
+import { Product, Category, Post, PostComment, CommentReply } from '../types';
+
+const normalizeData = (doc: any) => {
+  const data = doc.data();
+  const item = { id: doc.id, ...data };
+  Object.keys(item).forEach(key => {
+    if (item[key] instanceof Timestamp) {
+      item[key] = item[key].toDate().toISOString();
+    }
+  });
+  return item;
+};
 
 export function useProducts() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -39,10 +52,7 @@ export function useProducts() {
   useEffect(() => {
     const q = query(collection(db, 'products'), orderBy('name'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const items = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Product[];
+      const items = snapshot.docs.map(doc => normalizeData(doc)) as Product[];
       setProducts(items);
       setLoading(false);
     }, (error) => {
@@ -82,6 +92,7 @@ export function useProducts() {
 
 export function useAuth() {
   const [user, setUser] = useState<FirebaseUser | null>(null);
+  const [profile, setProfile] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -96,32 +107,35 @@ export function useAuth() {
         if (isDefaultAdmin) setIsAdmin(true);
 
         try {
-          // Check if user is admin in Firestore
-          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+          // Listen to user doc changes to keep profile in sync
+          const userDocRef = doc(db, 'users', firebaseUser.uid);
+          const userDoc = await getDoc(userDocRef);
+          
           if (userDoc.exists()) {
             const userData = userDoc.data();
+            setProfile(userData);
             const role = userData.role;
-            console.log('User role from Firestore:', role);
             setIsAdmin(role === 'admin' || isDefaultAdmin);
 
             // Update emailVerified status if changed
             if (userData.emailVerified !== firebaseUser.emailVerified) {
-              await updateDoc(doc(db, 'users', firebaseUser.uid), {
+              await updateDoc(userDocRef, {
                 emailVerified: firebaseUser.emailVerified
               });
             }
           } else {
             console.log('User doc does not exist, creating...');
             const role = isDefaultAdmin ? 'admin' : 'user';
-            
-            await setDoc(doc(db, 'users', firebaseUser.uid), {
+            const initialProfile = {
               uid: firebaseUser.uid,
               email: firebaseUser.email,
               role: role,
               displayName: firebaseUser.displayName,
+              photoURL: firebaseUser.photoURL,
               emailVerified: firebaseUser.emailVerified
-            });
-            console.log('User doc created with role:', role);
+            };
+            await setDoc(userDocRef, initialProfile);
+            setProfile(initialProfile);
             setIsAdmin(role === 'admin');
           }
         } catch (error) {
@@ -130,6 +144,7 @@ export function useAuth() {
         }
       } else {
         setIsAdmin(false);
+        setProfile(null);
       }
       setLoading(false);
     });
@@ -199,8 +214,38 @@ export function useAuth() {
     }
   };
 
+  const updateProfileData = async (data: { displayName?: string; photoURL?: string }) => {
+    if (!auth.currentUser) return;
+    try {
+      // Firebase Auth photoURL has a length limit. Data URLs (base64) are often too long.
+      // We only update Auth profile with displayName and if photoURL is a standard URL.
+      const authUpdates: any = {};
+      if (data.displayName) authUpdates.displayName = data.displayName;
+      
+      // Only set photoURL in Auth if it's not a data URL (base64)
+      if (data.photoURL && !data.photoURL.startsWith('data:')) {
+        authUpdates.photoURL = data.photoURL;
+      }
+
+      if (Object.keys(authUpdates).length > 0) {
+        await updateProfile(auth.currentUser, authUpdates);
+      }
+
+      // Always update Firestore doc (Firestore has 1MB limit for strings)
+      const userRef = doc(db, 'users', auth.currentUser.uid);
+      await updateDoc(userRef, data);
+      
+      // Update local profile state immediately
+      setProfile((prev: any) => ({ ...prev, ...data }));
+    } catch (error) {
+      console.error('Update profile error:', error);
+      throw error;
+    }
+  };
+
   return { 
     user, 
+    profile,
     isAdmin, 
     loading, 
     login: loginWithGoogle, // Maintain compatibility
@@ -209,7 +254,8 @@ export function useAuth() {
     loginWithEmail,
     logout,
     resendVerification,
-    resetPassword
+    resetPassword,
+    updateProfile: updateProfileData
   };
 }
 
@@ -306,7 +352,7 @@ export function useReviews(productId?: string, onlyApproved: boolean = true, lim
 
     try {
       const snapshot = await getDocs(q);
-      const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const items = snapshot.docs.map(doc => normalizeData(doc));
       setReviews(prev => [...prev, ...items]);
       setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
       setHasMore(snapshot.docs.length === limitCount);
@@ -321,7 +367,7 @@ export function useReviews(productId?: string, onlyApproved: boolean = true, lim
         ...review,
         replies: [],
         isApproved: false, // Default to false for moderation
-        createdAt: new Date().toISOString()
+        createdAt: serverTimestamp()
       });
     } catch (error) {
       handleFirestoreError(error, OperationType.CREATE, 'reviews');
@@ -368,7 +414,7 @@ export function useReviews(productId?: string, onlyApproved: boolean = true, lim
       await addDoc(collection(db, 'consultations'), {
         ...request,
         status: 'pending',
-        createdAt: new Date().toISOString()
+        createdAt: serverTimestamp()
       });
       console.log('Consultation request sent to activenhanh@gmail.com:', request);
     } catch (error) {
@@ -396,7 +442,7 @@ export function useOrders(fetchOrders: boolean = false, email?: string) {
     }
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const items = snapshot.docs.map(doc => normalizeData(doc));
       setOrders(items);
       setLoading(false);
     }, (error) => {
@@ -415,7 +461,7 @@ export function useOrders(fetchOrders: boolean = false, email?: string) {
       batch.set(orderRef, {
         ...order,
         status: 'pending',
-        createdAt: new Date().toISOString()
+        createdAt: serverTimestamp()
       });
 
       // Update stock for each item
@@ -518,10 +564,7 @@ export function usePosts() {
   useEffect(() => {
     const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const items = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Post[];
+      const items = snapshot.docs.map(doc => normalizeData(doc)) as Post[];
       setPosts(items);
       setLoading(false);
     }, (error) => {
@@ -536,8 +579,8 @@ export function usePosts() {
       await addDoc(collection(db, 'posts'), {
         ...post,
         views: 0,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
       });
     } catch (error) {
       handleFirestoreError(error, OperationType.CREATE, 'posts');
@@ -549,7 +592,7 @@ export function usePosts() {
       const postRef = doc(db, 'posts', id);
       await updateDoc(postRef, {
         ...post,
-        updatedAt: new Date().toISOString()
+        updatedAt: serverTimestamp()
       });
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, `posts/${id}`);
@@ -579,10 +622,7 @@ export function usePostComments(postId: string) {
       orderBy('createdAt', 'desc')
     );
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const items = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as PostComment[];
+      const items = snapshot.docs.map(doc => normalizeData(doc)) as PostComment[];
       setComments(items);
       setLoading(false);
     }, (error) => {
@@ -597,10 +637,29 @@ export function usePostComments(postId: string) {
       await addDoc(collection(db, 'post_comments'), {
         ...comment,
         status: 'pending',
-        createdAt: new Date().toISOString()
+        replies: [],
+        createdAt: serverTimestamp()
       });
     } catch (error) {
       handleFirestoreError(error, OperationType.CREATE, 'post_comments');
+    }
+  };
+
+  const addReply = async (commentId: string, reply: Omit<CommentReply, 'createdAt'>) => {
+    try {
+      const commentRef = doc(db, 'post_comments', commentId);
+      const commentSnap = await getDoc(commentRef);
+      if (commentSnap.exists()) {
+        const currentReplies = commentSnap.data().replies || [];
+        await updateDoc(commentRef, {
+          replies: [...currentReplies, {
+            ...reply,
+            createdAt: new Date().toISOString()
+          }]
+        });
+      }
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `post_comments/${commentId}`);
     }
   };
 
@@ -620,7 +679,7 @@ export function usePostComments(postId: string) {
     }
   };
 
-  return { comments, loading, addComment, approveComment, deleteComment };
+  return { comments, loading, addComment, addReply, approveComment, deleteComment };
 }
 
 export function useAllPostComments() {
@@ -630,10 +689,7 @@ export function useAllPostComments() {
   useEffect(() => {
     const q = query(collection(db, 'post_comments'), orderBy('createdAt', 'desc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const items = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as PostComment[];
+      const items = snapshot.docs.map(doc => normalizeData(doc)) as PostComment[];
       setComments(items);
       setLoading(false);
     }, (error) => {

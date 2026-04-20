@@ -30,6 +30,8 @@ import WarrantyModal from './components/WarrantyModal';
 import PaymentGuideModal from './components/PaymentGuideModal';
 import GuideModal from './components/GuideModal';
 import LoginModal from './components/LoginModal';
+import UserProfileModal from './components/UserProfileModal';
+import SEO from './components/SEO';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { useProducts, useAuth, useCategories, useReviews, usePosts } from './hooks/useFirebase';
 import { useRecentlyViewed } from './hooks/useRecentlyViewed';
@@ -102,6 +104,7 @@ export default function App() {
   const [isPaymentGuideOpen, setIsPaymentGuideOpen] = useState(false);
   const [isGuideOpen, setIsGuideOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [currentView, setCurrentView] = useState<'home' | 'news'>('home');
@@ -298,6 +301,8 @@ export default function App() {
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-white font-sans">
+        <SEO />
+        
         <Header 
           cartCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)} 
           onCartClick={() => setIsCartOpen(true)}
@@ -306,6 +311,7 @@ export default function App() {
           onContactClick={() => setIsContactOpen(true)}
           onGuideClick={() => setIsGuideOpen(true)}
           onLoginClick={() => setIsLoginOpen(true)}
+          onProfileClick={() => setIsProfileOpen(true)}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
         />
@@ -752,6 +758,11 @@ export default function App() {
         <LoginModal
           isOpen={isLoginOpen}
           onClose={() => setIsLoginOpen(false)}
+        />
+
+        <UserProfileModal
+          isOpen={isProfileOpen}
+          onClose={() => setIsProfileOpen(false)}
         />
 
         <ProductDetail

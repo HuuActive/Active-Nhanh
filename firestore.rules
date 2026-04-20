@@ -94,11 +94,14 @@ service cloud.firestore {
     }
 
     function isValidPostComment(data) {
-      return data.postId is string &&
+      return data.keys().hasAll(['postId', 'userId', 'userName', 'userPhoto', 'content', 'status', 'createdAt']) &&
+             data.keys().size() == 7 &&
+             data.postId is string && data.postId.size() > 0 &&
              data.userId == request.auth.uid &&
-             data.userName is string &&
+             data.userName is string && data.userName.size() > 0 && data.userName.size() < 100 &&
+             data.userPhoto is string &&
              data.content is string && data.content.size() > 0 && data.content.size() < 1000 &&
-             data.status in ['pending', 'approved', 'spam'] &&
+             data.status == 'pending' &&
              data.createdAt == request.time;
     }
 
@@ -118,8 +121,16 @@ service cloud.firestore {
 
     match /post_comments/{commentId} {
       allow read: if true;
-      allow create: if isAuthenticated() && isValidPostComment(request.resource.data);
-      allow update, delete: if isAdmin();
+      allow create: if isAuthenticated() && 
+                      request.auth.token.email_verified == true &&
+                      isValidPostComment(request.resource.data);
+      allow update: if isAdmin() || (
+                      isAuthenticated() && 
+                      request.auth.token.email_verified == true &&
+                      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['replies']) &&
+                      request.resource.data.status == resource.data.status
+                    );
+      allow delete: if isAdmin();
     }
 
     match /products/{productId} {
@@ -143,8 +154,9 @@ service cloud.firestore {
       allow read: if true;
       allow create: if request.resource.data.isApproved == false;
       allow update: if isAdmin() || (
-        // Allow users to add replies if they are authenticated
+        // Allow users to add replies if they are authenticated and verified
         isAuthenticated() && 
+        request.auth.token.email_verified == true &&
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['replies']) &&
         request.resource.data.isApproved == resource.data.isApproved
       );
