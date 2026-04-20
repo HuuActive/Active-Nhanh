@@ -69,6 +69,9 @@ async function startServer() {
       let title = "ActiveNhanh - Dịch vụ số & Tài khoản cao cấp giá rẻ";
       let description = "ActiveNhanh cung cấp các loại tài khoản cao cấp: Youtube Premium, Netflix, Canva Pro, Windows, Office... giá rẻ, uy tín, bảo hành 1 đổi 1.";
       let image = "https://picsum.photos/seed/activenhanh/1200/630";
+      const protocol = req.protocol === 'https' || req.get('x-forwarded-proto') === 'https' ? 'https' : 'http';
+      const host = req.get('host');
+      let ogUrl = `${protocol}://${host}${url}`;
 
       // If product ID or Slug exists, try to fetch its data
       if (productId || productSlug) {
@@ -87,12 +90,22 @@ async function startServer() {
             const querySnapshot = await getDocs(q);
             if (!querySnapshot.empty) {
               productData = querySnapshot.docs[0].data();
+            } else {
+              // Try searching by name formatted as slug if direct slug fails
+              const allProductsRef = collection(db, 'products');
+              const allSnap = await getDocs(allProductsRef);
+              productData = allSnap.docs.map(d => d.data()).find(p => {
+                const generatedSlug = (p.slug || p.name?.toLowerCase()
+                  .replace(/ /g, '-')
+                  .replace(/[^\w-]+/g, ''));
+                return generatedSlug === productSlug;
+              });
             }
           }
 
           if (productData) {
-            title = productData.seoTitle || `${productData.name} - ActiveNhanh`;
-            description = productData.seoDescription || productData.description || description;
+            title = productData.name ? `${productData.name} - ActiveNhanh` : title;
+            description = productData.shortFeatures?.replace(/;/g, ' • ') || productData.description || description;
             image = productData.image || image;
             console.log(`Setting metadata for product: ${productData.name}`);
           }
@@ -100,31 +113,32 @@ async function startServer() {
           console.error('Error fetching product for metadata:', error);
         }
       } else if (postSlug) {
+        // ... (existing post logic is fine, let's keep it but slightly refine)
         try {
           const postsRef = collection(db, 'posts');
           const q = query(postsRef, where('slug', '==', postSlug), limit(1));
           const querySnapshot = await getDocs(q);
           if (!querySnapshot.empty) {
             const postData = querySnapshot.docs[0].data();
-            title = postData.seoTitle || `${postData.title} - Tin Công Nghệ - ActiveNhanh`;
-            description = postData.seoDescription || postData.excerpt || postData.content.substring(0, 160);
-            image = postData.thumbnail || image;
-            console.log(`Setting metadata for post: ${postData.title}`);
+            title = `${postData.title} - ActiveNhanh`;
+            description = postData.excerpt || postData.content?.substring(0, 160) || description;
+            image = postData.thumbnail || postData.image || image;
           }
         } catch (error) {
           console.error('Error fetching post for metadata:', error);
         }
-      } else if (url === '/tin-cong-nghe') {
+      } else if (url === '/tin-cong-nghe' || url.startsWith('/tin-cong-nghe?')) {
         title = "Tin Công Nghệ - ActiveNhanh";
         description = "Cập nhật những thông tin công nghệ mới nhất, thủ tục và mẹo sử dụng các dịch vụ số tại ActiveNhanh.";
       }
 
-
-      // Replace placeholders
+      console.log(`Serving URL: ${url} | Title: ${title}`);
       const html = template
+        .replace(/__TITLE__/g, title)
         .replace(/__OG_TITLE__/g, title)
         .replace(/__OG_DESCRIPTION__/g, description)
-        .replace(/__OG_IMAGE__/g, image);
+        .replace(/__OG_IMAGE__/g, image)
+        .replace(/__OG_URL__/g, ogUrl);
 
       res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
     } catch (e) {
