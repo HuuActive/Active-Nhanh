@@ -180,5 +180,10 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin();
     }
+
+    match /site_stats/{allPaths=**} {
+      allow read: if isAdmin();
+      allow write: if true;
+    }
   }
 }

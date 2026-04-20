@@ -557,22 +557,57 @@ export function useCategories() {
   return { categories, loading, addCategory, editCategory, removeCategory };
 }
 
-export function usePosts() {
+export function usePosts(pageSize = 9) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [lastDoc, setLastDoc] = useState<any>(null);
 
   useEffect(() => {
-    const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
+    const q = query(
+      collection(db, 'posts'), 
+      orderBy('createdAt', 'desc'),
+      limit(pageSize)
+    );
+    
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const items = snapshot.docs.map(doc => normalizeData(doc)) as Post[];
       setPosts(items);
+      setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
+      setHasMore(snapshot.docs.length >= pageSize);
       setLoading(false);
     }, (error) => {
       handleFirestoreError(error, OperationType.LIST, 'posts');
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [pageSize]);
+
+  const loadMore = async () => {
+    if (!lastDoc || loadingMore || !hasMore) return;
+    
+    setLoadingMore(true);
+    try {
+      const q = query(
+        collection(db, 'posts'),
+        orderBy('createdAt', 'desc'),
+        startAfter(lastDoc),
+        limit(pageSize)
+      );
+      
+      const snapshot = await getDocs(q);
+      const items = snapshot.docs.map(doc => normalizeData(doc)) as Post[];
+      
+      setPosts(prev => [...prev, ...items]);
+      setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
+      setHasMore(snapshot.docs.length >= pageSize);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.LIST, 'posts');
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   const addPost = async (post: Omit<Post, 'id' | 'createdAt' | 'updatedAt' | 'views'>) => {
     try {
@@ -607,7 +642,7 @@ export function usePosts() {
     }
   };
 
-  return { posts, loading, addPost, editPost, removePost };
+  return { posts, loading, loadingMore, hasMore, loadMore, addPost, editPost, removePost };
 }
 
 export function usePostComments(postId: string) {
@@ -725,3 +760,66 @@ export function useAllPostComments() {
 
   return { comments, loading, approveComment, markSpam, deleteComment };
 }
+
+export function useAnalytics() {
+  const [summary, setSummary] = useState<any>(null);
+  const [dailyStats, setDailyStats] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const summaryRef = doc(db, 'site_stats', 'summary');
+    const dailyRef = query(
+      collection(db, 'site_stats', 'daily', 'records'),
+      orderBy('date', 'desc'),
+      limit(30)
+    );
+
+    const unsubSummary = onSnapshot(summaryRef, (doc) => {
+      if (doc.exists()) setSummary(doc.data());
+      else setSummary({ totalVisits: 0 });
+    });
+
+    const unsubDaily = onSnapshot(dailyRef, (snapshot) => {
+      const items = snapshot.docs.map(doc => doc.data());
+      setDailyStats(items);
+      setLoading(false);
+    });
+
+    return () => {
+      unsubSummary();
+      unsubDaily();
+    };
+  }, []);
+
+  return { summary, dailyStats, loading };
+}
+
+export const trackVisit = async () => {
+  // Simple session tracking to avoid overcounting refreshes
+  const today = new Date().toISOString().split('T')[0];
+  const sessionKey = `v_tracked_${today}`;
+  
+  if (sessionStorage.getItem(sessionKey)) return;
+
+  try {
+    const batch = writeBatch(db);
+    
+    const summaryRef = doc(db, 'site_stats', 'summary');
+    batch.set(summaryRef, { 
+      totalVisits: increment(1),
+      lastVisit: serverTimestamp() 
+    }, { merge: true });
+    
+    const dailyRef = doc(db, 'site_stats', 'daily', 'records', today);
+    batch.set(dailyRef, { 
+      count: increment(1), 
+      date: today 
+    }, { merge: true });
+    
+    await batch.commit();
+    sessionStorage.setItem(sessionKey, 'true');
+  } catch (error) {
+    // Silent fail for analytics
+    console.warn('Analytics silent fail:', error);
+  }
+};

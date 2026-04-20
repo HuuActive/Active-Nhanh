@@ -36,6 +36,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { useProducts, useAuth, useCategories, useReviews, usePosts } from './hooks/useFirebase';
 import { useRecentlyViewed } from './hooks/useRecentlyViewed';
 import { Product, CartItem, Category, Post } from './types';
+import { trackVisit } from './hooks/useFirebase';
 
 const faqs = [
   {
@@ -89,7 +90,7 @@ const categoryIcons: Record<string, any> = {
 export default function App() {
   const { products, loading: productsLoading } = useProducts();
   const { categories: dbCategories } = useCategories();
-  const { posts, loading: postsLoading } = usePosts();
+  const { posts, loading: postsLoading, hasMore: postsHasMore, loadingMore: postsLoadingMore, loadMore: postsLoadMore } = usePosts(9);
   const { reviews: generalReviews } = useReviews('general');
   const { isAdmin } = useAuth();
   const { recentlyViewed, addToRecentlyViewed } = useRecentlyViewed();
@@ -132,6 +133,9 @@ export default function App() {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
     window.addEventListener('resize', checkMobile);
+    
+    // Track site visit
+    trackVisit();
     
     const timer = setInterval(() => {
       setTestimonialIndex((prev) => {
@@ -687,6 +691,9 @@ export default function App() {
               posts={posts} 
               onViewPost={handleViewPost} 
               loading={postsLoading} 
+              hasMore={postsHasMore}
+              loadingMore={postsLoadingMore}
+              onLoadMore={postsLoadMore}
             />
           )}
         </main>
@@ -770,6 +777,8 @@ export default function App() {
           isOpen={!!selectedProduct}
           onClose={handleCloseProduct}
           onAddToCart={addToCart}
+          allProducts={products}
+          onViewProduct={handleViewProduct}
         />
       </div>
     </ErrorBoundary>

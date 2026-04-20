@@ -8,6 +8,7 @@ import { useState } from 'react';
 import emailjs from '@emailjs/browser';
 import { Product } from '../types';
 import { formatPrice } from '../lib/utils';
+import ProductCard from './ProductCard';
 import { useReviews, useAuth } from '../hooks/useFirebase';
 
 interface ProductDetailProps {
@@ -15,9 +16,11 @@ interface ProductDetailProps {
   isOpen: boolean;
   onClose: () => void;
   onAddToCart: (product: Product) => void;
+  allProducts: Product[];
+  onViewProduct: (product: Product) => void;
 }
 
-export default function ProductDetail({ product, isOpen, onClose, onAddToCart }: ProductDetailProps) {
+export default function ProductDetail({ product, isOpen, onClose, onAddToCart, allProducts, onViewProduct }: ProductDetailProps) {
   const [activeTab, setActiveTab] = useState<'description' | 'guide' | 'terms'>('description');
   const { user, profile, isAdmin } = useAuth();
   const { reviews, hasMore: hasMoreReviews, loadMore: loadMoreReviews, addReview, addReply, deleteReview, addConsultationRequest } = useReviews(product?.id || '', true, 5);
@@ -859,6 +862,33 @@ export default function ProductDetail({ product, isOpen, onClose, onAddToCart }:
                         </div>
                       )}
                     </div>
+
+                    {/* Related Products Section */}
+                    {allProducts && product && (
+                      <div className="mt-20 border-t border-brand-100 pt-20">
+                        <div className="mb-12 flex items-center justify-between">
+                          <div>
+                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-tiktok-cyan mb-2 block">Có thể bạn quan tâm</span>
+                            <h3 className="text-2xl font-black text-tiktok-black uppercase tracking-tighter">Sản phẩm tương tự</h3>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
+                          {allProducts
+                            .filter(p => p.category === product.category && p.id !== product.id)
+                            .slice(0, 3)
+                            .map(relatedProduct => (
+                              <ProductCard 
+                                key={relatedProduct.id}
+                                product={relatedProduct}
+                                onAddToCart={onAddToCart}
+                                onView={(p) => {
+                                  onViewProduct(p);
+                                }}
+                              />
+                            ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

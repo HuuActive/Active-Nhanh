@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Plus, Edit2, Trash2, Save, Loader2, Upload, Search, Info, Package, Shield, HelpCircle, Layout, Eye, Zap, ShoppingBag, CheckCircle, Clock, AlertCircle, User, Users, Tag, Star, FileText, MessageCircle, ShieldAlert, FileEdit, Eye as EyeIcon } from 'lucide-react';
+import { X, Plus, Edit2, Trash2, Save, Loader2, Upload, Search, Info, Package, Shield, HelpCircle, Layout, Eye, Zap, ShoppingBag, CheckCircle, Clock, AlertCircle, User, Users, Tag, Star, FileText, MessageCircle, ShieldAlert, FileEdit, Eye as EyeIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
-import { useProducts, useOrders, useUsers, useCategories, useReviews, usePosts, useAllPostComments, useAuth } from '../hooks/useFirebase';
+import { useProducts, useOrders, useUsers, useCategories, useReviews, usePosts, useAllPostComments, useAuth, useAnalytics } from '../hooks/useFirebase';
 import { Product, Category, Post, PostComment } from '../types';
 import { formatPrice, createSlug } from '../lib/utils';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 
 interface AdminPanelProps {
   isOpen: boolean;
@@ -23,9 +24,10 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
   const { user } = useAuth();
   const { posts, loading: postsLoading, addPost, editPost, removePost } = usePosts();
   const { comments: postComments, loading: postCommentsLoading, approveComment: approvePostComment, markSpam: markPostCommentSpam, deleteComment: removePostComment } = useAllPostComments();
+  const { summary, dailyStats, loading: statsLoading } = useAnalytics();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
-  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'users' | 'categories' | 'reviews' | 'posts' | 'comments'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'users' | 'categories' | 'reviews' | 'posts' | 'comments' | 'analytics'>('products');
   const [formTab, setFormTab] = useState<'basic' | 'detail' | 'seo'>('basic');
   
   // Post management state
@@ -85,6 +87,18 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
     seoDescription: '',
     seoKeywords: ''
   });
+
+  const tabScrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollTabs = (direction: 'left' | 'right') => {
+    if (tabScrollRef.current) {
+      const scrollAmount = 200;
+      tabScrollRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -263,63 +277,85 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
                 <X className="h-6 w-6" />
               </button>
             </h2>
-            <div className="flex overflow-x-auto rounded-xl bg-brand-50 p-1 no-scrollbar -mx-2 sm:mx-0">
-              <button
-                onClick={() => setActiveTab('products')}
-                className={`flex flex-shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs sm:text-sm font-bold transition-all ${activeTab === 'products' ? 'bg-white text-tiktok-black shadow-sm' : 'text-brand-400 hover:text-tiktok-black'}`}
+            <div className="flex items-center gap-1 sm:gap-2">
+              <button 
+                onClick={() => scrollTabs('left')}
+                className="flex lg:hidden h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-400 active:scale-95"
               >
-                <Package className="h-4 w-4" /> Sản phẩm
+                <ChevronLeft className="h-4 w-4" />
               </button>
-              <button
-                onClick={() => setActiveTab('orders')}
-                className={`flex flex-shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs sm:text-sm font-bold transition-all ${activeTab === 'orders' ? 'bg-white text-tiktok-black shadow-sm' : 'text-brand-400 hover:text-tiktok-black'}`}
+              
+              <div ref={tabScrollRef} className="flex overflow-x-auto rounded-xl bg-brand-50 p-1 no-scrollbar -mx-2 sm:mx-0 scroll-smooth">
+                <button
+                  onClick={() => setActiveTab('analytics')}
+                  className={`flex flex-shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs sm:text-sm font-bold transition-all ${activeTab === 'analytics' ? 'bg-white text-tiktok-black shadow-sm' : 'text-brand-400 hover:text-tiktok-black'}`}
+                >
+                  <Zap className="h-4 w-4 text-tiktok-cyan" /> Thống kê
+                </button>
+                <button
+                  onClick={() => setActiveTab('products')}
+                  className={`flex flex-shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs sm:text-sm font-bold transition-all ${activeTab === 'products' ? 'bg-white text-tiktok-black shadow-sm' : 'text-brand-400 hover:text-tiktok-black'}`}
+                >
+                  <Package className="h-4 w-4" /> Sản phẩm
+                </button>
+                <button
+                  onClick={() => setActiveTab('orders')}
+                  className={`flex flex-shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs sm:text-sm font-bold transition-all ${activeTab === 'orders' ? 'bg-white text-tiktok-black shadow-sm' : 'text-brand-400 hover:text-tiktok-black'}`}
+                >
+                  <ShoppingBag className="h-4 w-4" /> Đơn hàng
+                  {orders.filter(o => o.status === 'pending').length > 0 && (
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-tiktok-magenta text-[10px] text-white">
+                      {orders.filter(o => o.status === 'pending').length}
+                    </span>
+                  )}
+                </button>
+                <button
+                  onClick={() => setActiveTab('posts')}
+                  className={`flex flex-shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs sm:text-sm font-bold transition-all ${activeTab === 'posts' ? 'bg-white text-tiktok-black shadow-sm' : 'text-brand-400 hover:text-tiktok-black'}`}
+                >
+                  <FileText className="h-4 w-4" /> Bài viết
+                </button>
+                <button
+                  onClick={() => setActiveTab('comments')}
+                  className={`flex flex-shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs sm:text-sm font-bold transition-all ${activeTab === 'comments' ? 'bg-white text-tiktok-black shadow-sm' : 'text-brand-400 hover:text-tiktok-black'}`}
+                >
+                  <MessageCircle className="h-4 w-4" /> Blog
+                  {postComments.filter(c => c.status === 'pending').length > 0 && (
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-tiktok-magenta text-[10px] text-white">
+                      {postComments.filter(c => c.status === 'pending').length}
+                    </span>
+                  )}
+                </button>
+                <button
+                  onClick={() => setActiveTab('users')}
+                  className={`flex flex-shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs sm:text-sm font-bold transition-all ${activeTab === 'users' ? 'bg-white text-tiktok-black shadow-sm' : 'text-brand-400 hover:text-tiktok-black'}`}
+                >
+                  <Users className="h-4 w-4" /> Khách hàng
+                </button>
+                <button
+                  onClick={() => setActiveTab('categories')}
+                  className={`flex flex-shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs sm:text-sm font-bold transition-all ${activeTab === 'categories' ? 'bg-white text-tiktok-black shadow-sm' : 'text-brand-400 hover:text-tiktok-black'}`}
+                >
+                  <Tag className="h-4 w-4" /> Danh mục
+                </button>
+                <button
+                  onClick={() => setActiveTab('reviews')}
+                  className={`flex flex-shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs sm:text-sm font-bold transition-all ${activeTab === 'reviews' ? 'bg-white text-tiktok-black shadow-sm' : 'text-brand-400 hover:text-tiktok-black'}`}
+                >
+                  <Star className="h-4 w-4" /> Đánh giá
+                  {allReviews.filter(r => !r.isApproved).length > 0 && (
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-tiktok-magenta text-[10px] text-white">
+                      {allReviews.filter(r => !r.isApproved).length}
+                    </span>
+                  )}
+                </button>
+              </div>
+
+              <button 
+                onClick={() => scrollTabs('right')}
+                className="flex lg:hidden h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-400 active:scale-95"
               >
-                <ShoppingBag className="h-4 w-4" /> Đơn hàng
-                {orders.filter(o => o.status === 'pending').length > 0 && (
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-tiktok-magenta text-[10px] text-white">
-                    {orders.filter(o => o.status === 'pending').length}
-                  </span>
-                )}
-              </button>
-              <button
-                onClick={() => setActiveTab('posts')}
-                className={`flex flex-shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs sm:text-sm font-bold transition-all ${activeTab === 'posts' ? 'bg-white text-tiktok-black shadow-sm' : 'text-brand-400 hover:text-tiktok-black'}`}
-              >
-                <FileText className="h-4 w-4" /> Bài viết
-              </button>
-              <button
-                onClick={() => setActiveTab('comments')}
-                className={`flex flex-shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs sm:text-sm font-bold transition-all ${activeTab === 'comments' ? 'bg-white text-tiktok-black shadow-sm' : 'text-brand-400 hover:text-tiktok-black'}`}
-              >
-                <MessageCircle className="h-4 w-4" /> Blog
-                {postComments.filter(c => c.status === 'pending').length > 0 && (
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-tiktok-magenta text-[10px] text-white">
-                    {postComments.filter(c => c.status === 'pending').length}
-                  </span>
-                )}
-              </button>
-              <button
-                onClick={() => setActiveTab('users')}
-                className={`flex flex-shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs sm:text-sm font-bold transition-all ${activeTab === 'users' ? 'bg-white text-tiktok-black shadow-sm' : 'text-brand-400 hover:text-tiktok-black'}`}
-              >
-                <Users className="h-4 w-4" /> Khách hàng
-              </button>
-              <button
-                onClick={() => setActiveTab('categories')}
-                className={`flex flex-shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs sm:text-sm font-bold transition-all ${activeTab === 'categories' ? 'bg-white text-tiktok-black shadow-sm' : 'text-brand-400 hover:text-tiktok-black'}`}
-              >
-                <Tag className="h-4 w-4" /> Danh mục
-              </button>
-              <button
-                onClick={() => setActiveTab('reviews')}
-                className={`flex flex-shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs sm:text-sm font-bold transition-all ${activeTab === 'reviews' ? 'bg-white text-tiktok-black shadow-sm' : 'text-brand-400 hover:text-tiktok-black'}`}
-              >
-                <Star className="h-4 w-4" /> Đánh giá
-                {allReviews.filter(r => !r.isApproved).length > 0 && (
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-tiktok-magenta text-[10px] text-white">
-                    {allReviews.filter(r => !r.isApproved).length}
-                  </span>
-                )}
+                <ChevronRight className="h-4 w-4" />
               </button>
             </div>
           </div>
@@ -329,7 +365,71 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
         </div>
 
         <div className="h-[calc(90vh-140px)] overflow-hidden">
-          {activeTab === 'products' ? (
+          {activeTab === 'analytics' ? (
+            <div className="h-full overflow-y-auto p-6 bg-brand-50/20">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="bg-white p-6 rounded-[32px] shadow-sm border border-brand-100">
+                  <div className="flex items-center gap-4 mb-2">
+                    <div className="p-3 bg-tiktok-cyan/10 rounded-2xl text-tiktok-cyan">
+                      <Users className="h-6 w-6" />
+                    </div>
+                    <span className="text-xs font-bold text-brand-400 uppercase">Tổng lượt truy cập</span>
+                  </div>
+                  <div className="text-4xl font-black text-tiktok-black">{summary?.totalVisits || 0}</div>
+                  <p className="text-[10px] text-brand-400 mt-2">Cập nhật lần cuối: {summary?.lastVisit ? new Date(summary.lastVisit).toLocaleString('vi-VN') : 'N/A'}</p>
+                </div>
+
+                <div className="bg-white p-6 rounded-[32px] shadow-sm border border-brand-100">
+                  <div className="flex items-center gap-4 mb-2">
+                    <div className="p-3 bg-tiktok-magenta/10 rounded-2xl text-tiktok-magenta">
+                      <Zap className="h-6 w-6" />
+                    </div>
+                    <span className="text-xs font-bold text-brand-400 uppercase">Hôm nay</span>
+                  </div>
+                  <div className="text-4xl font-black text-tiktok-black">
+                    {dailyStats.find(d => d.date === new Date().toISOString().split('T')[0])?.count || 0}
+                  </div>
+                </div>
+
+                <div className="bg-white p-6 rounded-[32px] shadow-sm border border-brand-100">
+                  <div className="flex items-center gap-4 mb-2">
+                    <div className="p-3 bg-brand-100 rounded-2xl text-brand-500">
+                      <Clock className="h-6 w-6" />
+                    </div>
+                    <span className="text-xs font-bold text-brand-400 uppercase">Trung bình/ngày</span>
+                  </div>
+                  <div className="text-4xl font-black text-tiktok-black">
+                    {dailyStats.length > 0 ? Math.round(dailyStats.reduce((acc, curr) => acc + curr.count, 0) / dailyStats.length) : 0}
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white p-8 rounded-[40px] shadow-sm border border-brand-100">
+                <h3 className="text-lg font-black text-tiktok-black mb-8 flex items-center gap-3">
+                  <Layout className="h-5 w-5 text-tiktok-cyan" /> 
+                  Biểu đồ truy cập (30 ngày gần nhất)
+                </h3>
+                <div className="h-[300px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={[...dailyStats].reverse()}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                      <XAxis 
+                        dataKey="date" 
+                        tick={{fontSize: 10, fontWeight: 'bold'}}
+                        tickFormatter={(str) => str.split('-').slice(1).reverse().join('/')}
+                      />
+                      <YAxis tick={{fontSize: 10, fontWeight: 'bold'}} />
+                      <Tooltip 
+                        contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}}
+                        itemStyle={{fontWeight: '900', color: '#00f2ea'}}
+                      />
+                      <Bar dataKey="count" fill="#00f2ea" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+          ) : activeTab === 'products' ? (
             <div className="grid h-full grid-cols-1 lg:grid-cols-2">
               {/* Product List */}
               <div className="overflow-y-auto border-r border-brand-100 p-6">

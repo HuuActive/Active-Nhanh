@@ -72,18 +72,37 @@ export default function Header({
           </div>
 
           <nav className="hidden lg:flex lg:gap-8">
-            {['Sản phẩm', 'Tin công nghệ', 'Bảng giá', 'Hướng dẫn', 'Liên hệ'].map((item) => (
+            {['Sản phẩm', 'Tin công nghệ', 'Hướng dẫn', 'Liên hệ'].map((item) => (
               <button
                 key={item}
                 onClick={() => {
                   if (item === 'Liên hệ') onContactClick();
                   else if (item === 'Hướng dẫn') onGuideClick();
-                  else if (item === 'Sản phẩm') window.scrollTo({ top: 800, behavior: 'smooth' });
+                  else if (item === 'Sản phẩm') {
+                    if (window.location.pathname !== '/') {
+                      window.history.pushState({}, '', '/');
+                      window.dispatchEvent(new PopStateEvent('popstate'));
+                    }
+                    setTimeout(() => {
+                      const section = document.getElementById('products');
+                      if (section) {
+                        const offset = 80;
+                        const bodyRect = document.body.getBoundingClientRect().top;
+                        const elementRect = section.getBoundingClientRect().top;
+                        const elementPosition = elementRect - bodyRect;
+                        const offsetPosition = elementPosition - offset;
+
+                        window.scrollTo({
+                          top: offsetPosition,
+                          behavior: 'smooth'
+                        });
+                      }
+                    }, 100);
+                  }
                   else if (item === 'Tin công nghệ') {
                     window.history.pushState({}, '', '/tin-cong-nghe');
                     window.dispatchEvent(new PopStateEvent('popstate'));
                   }
-                  else if (item === 'Bảng giá') window.scrollTo({ top: 1200, behavior: 'smooth' });
                 }}
                 className="text-[13px] lg:text-sm font-semibold text-brand-600 transition-all hover:text-tiktok-black hover:underline decoration-tiktok-cyan decoration-2 underline-offset-4"
               >
@@ -262,8 +281,25 @@ export default function Header({
                 <div className="text-[9px] font-black tracking-widest text-brand-400 mt-2 mb-1 px-2 uppercase">Điều hướng chính</div>
                 {[
                   { name: 'Sản phẩm', icon: Package, action: () => {
-                    const productsSection = document.getElementById('products');
-                    if (productsSection) productsSection.scrollIntoView({ behavior: 'smooth' });
+                    if (window.location.pathname !== '/') {
+                      window.history.pushState({}, '', '/');
+                      window.dispatchEvent(new PopStateEvent('popstate'));
+                    }
+                    setTimeout(() => {
+                      const section = document.getElementById('products');
+                      if (section) {
+                        const offset = 80;
+                        const bodyRect = document.body.getBoundingClientRect().top;
+                        const elementRect = section.getBoundingClientRect().top;
+                        const elementPosition = elementRect - bodyRect;
+                        const offsetPosition = elementPosition - offset;
+
+                        window.scrollTo({
+                          top: offsetPosition,
+                          behavior: 'smooth'
+                        });
+                      }
+                    }, 150);
                   }},
                   { name: 'Tin công nghệ', icon: Layout, action: () => {
                     window.history.pushState({}, '', '/tin-cong-nghe');

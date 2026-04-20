@@ -9,9 +9,19 @@ interface NewsPageProps {
   posts: Post[];
   onViewPost: (post: Post) => void;
   loading: boolean;
+  hasMore?: boolean;
+  loadingMore?: boolean;
+  onLoadMore?: () => void;
 }
 
-export default function NewsPage({ posts, onViewPost, loading }: NewsPageProps) {
+export default function NewsPage({ 
+  posts, 
+  onViewPost, 
+  loading,
+  hasMore = false,
+  loadingMore = false,
+  onLoadMore
+}: NewsPageProps) {
   const [quickViewPost, setQuickViewPost] = useState<Post | null>(null);
 
   if (loading) {
@@ -172,6 +182,28 @@ export default function NewsPage({ posts, onViewPost, loading }: NewsPageProps) 
             </motion.div>
           ))}
         </div>
+
+        {hasMore && (
+          <div className="mt-16 flex justify-center">
+            <button
+              onClick={onLoadMore}
+              disabled={loadingMore}
+              className="tiktok-button px-12 py-4 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed group"
+            >
+              {loadingMore ? (
+                <>
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-tiktok-black border-t-transparent" />
+                  Đang tải...
+                </>
+              ) : (
+                <>
+                  Xem thêm bài viết
+                  <ChevronRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
+            </button>
+          </div>
+        )}
 
         {posts.length === 0 && !loading && (
           <div className="bg-white rounded-[40px] py-32 text-center shadow-xl border border-brand-100">
