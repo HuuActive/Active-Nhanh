@@ -84,7 +84,9 @@ async function startServer() {
             if (productSnap.exists()) {
               productData = productSnap.data();
             }
-          } else if (productSlug) {
+          } 
+          
+          if (!productData && productSlug) {
             const productsRef = collection(db, 'products');
             const q = query(productsRef, where('slug', '==', productSlug), limit(1));
             const querySnapshot = await getDocs(q);
@@ -92,13 +94,14 @@ async function startServer() {
               productData = querySnapshot.docs[0].data();
             } else {
               // Try searching by name formatted as slug if direct slug fails
-              const allProductsRef = collection(db, 'products');
-              const allSnap = await getDocs(allProductsRef);
+              const allSnap = await getDocs(productsRef);
               productData = allSnap.docs.map(d => d.data()).find(p => {
-                const generatedSlug = (p.slug || p.name?.toLowerCase()
-                  .replace(/ /g, '-')
-                  .replace(/[^\w-]+/g, ''));
-                return generatedSlug === productSlug;
+                const pSlug = p.slug || (p.name || '').toLowerCase()
+                  .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Strip accents
+                  .replace(/đ/g, 'd').replace(/Đ/g, 'd')
+                  .replace(/[^a-z0-9]+/g, '-')
+                  .replace(/^-+|-+$/g, '');
+                return pSlug === productSlug;
               });
             }
           }
@@ -106,14 +109,21 @@ async function startServer() {
           if (productData) {
             title = productData.name ? `${productData.name} - ActiveNhanh` : title;
             description = productData.shortFeatures?.replace(/;/g, ' • ') || productData.description || description;
-            image = productData.image || image;
+            
+            if (productData.image) {
+              image = productData.image.startsWith('http') 
+                ? productData.image 
+                : `${protocol}://${host}${productData.image.startsWith('/') ? '' : '/'}${productData.image}`;
+            }
+            
             console.log(`Setting metadata for product: ${productData.name}`);
+          } else {
+            console.log(`Product NOT found for slug: ${productSlug}`);
           }
         } catch (error) {
           console.error('Error fetching product for metadata:', error);
         }
       } else if (postSlug) {
-        // ... (existing post logic is fine, let's keep it but slightly refine)
         try {
           const postsRef = collection(db, 'posts');
           const q = query(postsRef, where('slug', '==', postSlug), limit(1));
@@ -122,7 +132,13 @@ async function startServer() {
             const postData = querySnapshot.docs[0].data();
             title = `${postData.title} - ActiveNhanh`;
             description = postData.excerpt || postData.content?.substring(0, 160) || description;
-            image = postData.thumbnail || postData.image || image;
+            
+            const postImage = postData.thumbnail || postData.image;
+            if (postImage) {
+              image = postImage.startsWith('http') 
+                ? postImage 
+                : `${protocol}://${host}${postImage.startsWith('/') ? '' : '/'}${postImage}`;
+            }
           }
         } catch (error) {
           console.error('Error fetching post for metadata:', error);
@@ -134,11 +150,10 @@ async function startServer() {
 
       console.log(`Serving URL: ${url} | Title: ${title}`);
       const html = template
-        .replace(/__TITLE__/g, title)
-        .replace(/__OG_TITLE__/g, title)
-        .replace(/__OG_DESCRIPTION__/g, description)
-        .replace(/__OG_IMAGE__/g, image)
-        .replace(/__OG_URL__/g, ogUrl);
+        .split('{{TITLE}}').join(title)
+        .split('{{DESCRIPTION}}').join(description)
+        .split('{{IMAGE}}').join(image)
+        .split('{{URL}}').join(ogUrl);
 
       res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
     } catch (e) {
