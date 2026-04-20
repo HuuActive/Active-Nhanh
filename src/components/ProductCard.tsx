@@ -8,9 +8,10 @@ interface ProductCardProps {
   product: Product;
   onAddToCart: (product: Product) => void;
   onView?: (product: Product) => void;
+  layout?: 'grid' | 'wide';
 }
 
-export default function ProductCard({ product, onAddToCart, onView }: ProductCardProps) {
+export default function ProductCard({ product, onAddToCart, onView, layout = 'grid' }: ProductCardProps) {
   const [isSharing, setIsSharing] = useState(false);
 
   const handleView = (e?: React.MouseEvent) => {
@@ -44,22 +45,23 @@ export default function ProductCard({ product, onAddToCart, onView }: ProductCar
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className="tiktok-card group relative flex flex-col overflow-hidden"
+      className={`tiktok-card group relative flex overflow-hidden transition-all duration-500 ${layout === 'wide' ? 'flex-col md:flex-row md:items-center gap-4 md:gap-8 p-3 md:p-8 min-h-[160px]' : 'flex-col p-3 md:p-4'}`}
     >
       <a 
         href={productUrl}
-        className="relative aspect-square overflow-hidden rounded-lg bg-brand-50 cursor-pointer block"
+        className={`relative overflow-hidden rounded-xl bg-gradient-to-br from-brand-50 to-brand-100/50 cursor-pointer block border border-brand-100/50 shrink-0 transition-all ${layout === 'wide' ? 'w-full aspect-square md:w-[400px] md:h-[250px]' : 'aspect-square w-full'}`}
         onClick={handleView}
       >
         <img
           src={product.image}
           alt={product.name}
           loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
           referrerPolicy="no-referrer"
         />
-        <div className="absolute top-2 left-2">
-          <span className="rounded-full bg-tiktok-black/80 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
+        <div className="absolute inset-0 bg-tiktok-black/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="absolute top-3 left-3">
+          <span className="rounded-full bg-tiktok-black/80 px-3 py-1.5 text-[10px] md:text-xs font-black uppercase tracking-wider text-white backdrop-blur-md">
             {product.category}
           </span>
         </div>
@@ -104,70 +106,60 @@ export default function ProductCard({ product, onAddToCart, onView }: ProductCar
         </div>
       </a>
 
-      <div className="flex flex-1 flex-col pt-3 md:pt-4">
-        <div className="mb-1 flex items-start gap-1 justify-between">
-          <a
-            href={productUrl}
-            className="font-sans text-[13px] md:text-lg font-extrabold tracking-tight text-tiktok-black line-clamp-2 md:line-clamp-1 cursor-pointer hover:text-tiktok-cyan transition-colors"
-            onClick={handleView}
-          >
-            {product.name}
-          </a>
-          <div className="flex items-center gap-0.5 shrink-0 pt-0.5">
-            <Star className="h-2 w-2 md:h-3 md:w-3 fill-tiktok-cyan text-tiktok-cyan" />
-            <span className="text-[10px] md:text-xs font-bold text-tiktok-black">{product.rating}</span>
+      <div className={`flex flex-1 flex-col min-w-0 ${layout === 'wide' ? 'md:justify-center md:self-stretch py-2' : 'pt-3 md:pt-4'}`}>
+        <div className={`flex flex-col gap-2 ${layout === 'wide' ? 'mt-3 md:mt-0' : ''}`}>
+          <div className="flex items-start gap-2 justify-between">
+            <a
+              href={productUrl}
+              className={`font-sans font-extrabold tracking-tight text-tiktok-black hover:text-tiktok-cyan transition-colors cursor-pointer ${layout === 'wide' ? 'text-[15px] md:text-4xl' : 'text-[13px] md:text-lg line-clamp-2 md:line-clamp-1'}`}
+              onClick={handleView}
+            >
+              <h4 className="line-clamp-2">{product.name}</h4>
+            </a>
+            <div className="flex items-center gap-1 shrink-0 pt-1">
+              <Star className={`fill-tiktok-cyan text-tiktok-cyan ${layout === 'wide' ? 'h-4 w-4 md:h-8 md:w-8' : 'h-2 w-2 md:h-3 md:w-3'}`} />
+              <span className={`font-bold text-tiktok-black ${layout === 'wide' ? 'text-xs md:text-2xl' : 'text-[10px] md:text-xs'}`}>{product.rating}</span>
+            </div>
           </div>
+          
+          <div className="flex items-center gap-2">
+            <span className={`font-black uppercase px-2 py-1 rounded-md ${product.stock > 0 ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'} ${layout === 'wide' ? 'text-[8px] md:text-sm' : 'text-[7px] md:text-[10px]'}`}>
+              {product.stock > 0 ? 'Còn hàng' : 'Hết hàng'}
+            </span>
+          </div>
+
+          <p className={`font-medium text-brand-400 italic ${layout === 'wide' ? 'text-xs md:text-2xl leading-relaxed line-clamp-2' : 'text-[10px] md:text-sm line-clamp-2'}`}>
+            {product.shortFeatures ? product.shortFeatures.replace(/;/g, ' • ') : product.description}
+          </p>
         </div>
-        <div className="mb-1 flex items-center gap-2">
-          <span className={`text-[8px] md:text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-full ${product.stock > 0 ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
-            {product.stock > 0 ? 'Sẵn sàng' : 'Hết hàng'}
-          </span>
-        </div>
-        <p className="mb-2 md:mb-4 line-clamp-2 text-[12px] md:text-sm font-medium text-brand-500 italic">
-          {product.shortFeatures ? product.shortFeatures.replace(/;/g, ' • ') : product.description}
-        </p>
         
-        <div className="mt-auto flex flex-col pt-1 md:pt-2">
-          <div className="flex items-end justify-between gap-1 mb-1.5 md:mb-3">
-            <div className="flex flex-col">
-              <span className="text-[9px] md:text-xs font-bold text-brand-400 line-through">
+        <div className={`flex flex-col ${layout === 'wide' ? 'mt-6 md:mt-8' : 'mt-auto pt-1 md:pt-2'}`}>
+          <div className="flex items-end justify-between gap-4">
+            <div className="flex flex-col gap-1">
+              <span className={`font-bold text-brand-400 line-through ${layout === 'wide' ? 'text-[10px] md:text-3xl' : 'text-[9px] md:text-xs'}`}>
                 {formatPrice(product.originalPrice || Math.ceil((product.price * 1.8) / 10000) * 10000)}
               </span>
-              <div className="flex items-baseline gap-0.5">
-                <span className="text-[14px] md:text-xl font-black text-tiktok-magenta leading-none">{formatPrice(product.price)}</span>
+              <div className="flex items-baseline gap-2 flex-wrap">
+                <span className={`font-black text-tiktok-magenta leading-none ${layout === 'wide' ? 'text-xl md:text-7xl' : 'text-[13px] md:text-xl'}`}>
+                  {formatPrice(product.price)}
+                </span>
                 {product.priceUnit && (
-                  <span className="text-[8px] md:text-[10px] font-bold text-brand-400 uppercase">/ {product.priceUnit}</span>
+                  <span className={`font-extrabold text-brand-400 uppercase ${layout === 'wide' ? 'text-[10px] md:text-3xl' : 'text-[7px] md:text-[10px]'}`}>/ {product.priceUnit}</span>
                 )}
               </div>
             </div>
             
-            {/* Desktop only cart button */}
             <motion.button
               onClick={() => product.stock > 0 && onAddToCart(product)}
               disabled={product.stock <= 0}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              className={`hidden md:flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white ${product.stock > 0 ? 'bg-tiktok-black cursor-pointer' : 'bg-brand-200 cursor-not-allowed'}`}
-              style={product.stock > 0 ? { boxShadow: '3px 3px 0px #00F2EA' } : {}}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className={`${layout === 'wide' ? 'flex flex-row items-center gap-2 md:gap-4 px-4 md:px-12 h-10 md:h-24' : 'hidden md:flex h-11 md:h-11 w-11 md:w-11'} shrink-0 items-center justify-center rounded-xl md:rounded-[2rem] text-white font-black uppercase tracking-widest ${product.stock > 0 ? 'bg-tiktok-black cursor-pointer shadow-[3px_3px_0px_#00F2EA] md:shadow-[8px_8px_0px_#00F2EA]' : 'bg-brand-200 cursor-not-allowed'}`}
             >
-              <Plus className="h-6 w-6" />
+              <ShoppingCart className="h-5 w-5 md:h-10 md:w-10" />
+              {layout === 'wide' && <span className="text-[10px] md:text-4xl">MUA NGAY</span>}
             </motion.button>
           </div>
-
-          {/* Mobile only cart button - Small & Compact */}
-          <motion.button
-            onClick={() => product.stock > 0 && onAddToCart(product)}
-            disabled={product.stock <= 0}
-            whileTap={{ scale: 0.98 }}
-            className={`flex md:hidden w-full items-center justify-center gap-1 rounded-lg py-1.5 px-2 font-bold uppercase tracking-tight text-[11px] transition-all ${
-              product.stock > 0 
-                ? 'bg-tiktok-black text-white shadow-[2px_2px_0px_#00F2EA] active:shadow-none active:translate-x-[1px] active:translate-y-[1px]' 
-                : 'bg-brand-100 text-brand-400 cursor-not-allowed'
-            }`}
-          >
-            <ShoppingCart className="h-3 w-3" />
-            thêm vào giỏ
-          </motion.button>
         </div>
       </div>
     </motion.div>

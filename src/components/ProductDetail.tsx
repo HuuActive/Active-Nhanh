@@ -243,7 +243,7 @@ export default function ProductDetail({ product, isOpen, onClose, onAddToCart, a
             initial={{ scale: 0.9, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
-            className="relative w-full max-w-6xl overflow-hidden rounded-3xl bg-white shadow-2xl"
+            className="relative w-full max-w-7xl overflow-hidden rounded-3xl bg-white shadow-2xl h-[95vh] flex flex-col"
           >
             <button
               onClick={onClose}
@@ -252,7 +252,7 @@ export default function ProductDetail({ product, isOpen, onClose, onAddToCart, a
               <X className="h-6 w-6" />
             </button>
 
-            <div className="h-full max-h-[90vh] overflow-y-auto">
+            <div className="h-full overflow-y-auto">
               <div className="grid grid-cols-1 lg:grid-cols-2">
                 {/* Left: Image */}
                 <div className="p-6 lg:p-10">
@@ -862,35 +862,43 @@ export default function ProductDetail({ product, isOpen, onClose, onAddToCart, a
                         </div>
                       )}
                     </div>
+                  </div>
+                </div>
 
-                    {/* Related Products Section */}
-                    {allProducts && product && (
-                      <div className="mt-20 border-t border-brand-100 pt-20">
-                        <div className="mb-12 flex items-center justify-between">
-                          <div>
-                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-tiktok-cyan mb-2 block">Có thể bạn quan tâm</span>
-                            <h3 className="text-2xl font-black text-tiktok-black uppercase tracking-tighter">Sản phẩm tương tự</h3>
-                          </div>
+                {/* Related Products Section - Moved outside grid for full width */}
+                {allProducts && product && (
+                  <div className="p-6 lg:p-10 border-t border-brand-100 bg-brand-50/30">
+                    <div className="mx-auto max-w-6xl">
+                      <div className="mb-8 flex items-center justify-between">
+                        <div>
+                          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-tiktok-cyan mb-2 block">Có thể bạn quan tâm</span>
+                          <h3 className="text-xl md:text-2xl font-black text-tiktok-black uppercase tracking-tighter">Sản phẩm tương tự</h3>
                         </div>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
-                          {allProducts
-                            .filter(p => p.category === product.category && p.id !== product.id)
-                            .slice(0, 3)
-                            .map(relatedProduct => (
+                        <div className="hidden md:flex gap-2">
+                           <div className="h-1 w-8 rounded-full bg-tiktok-cyan" />
+                           <div className="h-1 w-4 rounded-full bg-tiktok-magenta" />
+                        </div>
+                      </div>
+                      
+                      <div className="flex gap-4 overflow-x-auto pb-6 no-scrollbar snap-x -mx-6 px-6 md:mx-0 md:px-0 md:grid md:grid-cols-3 lg:grid-cols-4 md:gap-6 md:overflow-visible">
+                        {allProducts
+                          .filter(p => p.category === product.category && p.id !== product.id)
+                          .slice(0, 4)
+                          .map(relatedProduct => (
+                            <div key={relatedProduct.id} className="min-w-[calc(50%-10px)] md:min-w-0 snap-center">
                               <ProductCard 
-                                key={relatedProduct.id}
                                 product={relatedProduct}
                                 onAddToCart={onAddToCart}
                                 onView={(p) => {
                                   onViewProduct(p);
                                 }}
                               />
-                            ))}
-                        </div>
+                            </div>
+                          ))}
                       </div>
-                    )}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </motion.div>
