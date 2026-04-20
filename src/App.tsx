@@ -658,16 +658,19 @@ export default function App() {
                 </div>
                 <div className="relative z-10">
                   <h2 className="mb-4 lg:mb-6 font-sans text-[18px] lg:text-6xl font-black tracking-tight">Sẵn sàng nâng cấp trải nghiệm?</h2>
-                  <p className="mb-8 lg:mb-10 text-brand-300 text-[13px] lg:text-lg max-w-2xl mx-auto">Hàng ngàn khách hàng đã tin dùng và hài lòng với dịch vụ của chúng tôi. Còn bạn thì sao?</p>
+                  <p className="mb-8 lg:mb-10 text-brand-300 text-[13px] lg:text-lg max-w-2xl mx-auto">Hàng ngàn khách hàng đã tin dùng và hài lòng với dịch vụ của chúng tôi. <br /> Còn bạn thì sao?</p>
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-3 lg:gap-4">
                     <button 
                       onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
-                      className="tiktok-button px-6 py-2.5 lg:px-12 lg:py-4 text-[13px] lg:text-lg bg-white text-tiktok-black flex items-center gap-2" 
+                      className="tiktok-button px-6 py-2.5 lg:px-12 lg:py-4 text-[13px] lg:text-lg bg-white text-tiktok-black flex items-center justify-center gap-2 rounded-full w-full sm:w-auto" 
                       style={{ boxShadow: '3px 3px 0px #00F2EA' }}
                     >
                       Bắt đầu ngay <ArrowRight className="h-4 w-4 lg:h-5 lg:w-5" />
                     </button>
-                    <button className="px-6 py-2.5 lg:px-12 lg:py-4 text-[13px] lg:text-lg font-bold border border-white/20 rounded-full hover:bg-white/10 transition-colors">
+                    <button 
+                      onClick={() => window.open('https://zalo.me/0778957345', '_blank')}
+                      className="px-6 py-2.5 lg:px-12 lg:py-4 text-[13px] lg:text-lg font-bold border border-white/20 rounded-full hover:bg-white/10 transition-colors w-full sm:w-auto"
+                    >
                       Liên hệ hỗ trợ
                     </button>
                   </div>
