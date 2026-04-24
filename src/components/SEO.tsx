@@ -14,7 +14,7 @@ export default function SEO({
   title = 'ActiveNhanh - Nâng cấp tài khoản số Premium uy tín', 
   description = 'ActiveNhanh chuyên cung cấp các dịch vụ nâng cấp tài khoản Premium giá rẻ: Youtube, Spotify, Canva, OpenAI, Windows, Office... Bảo hành uy tín 1 đổi 1.',
   keywords = 'nâng cấp tài khoản, account premium, giá rẻ, uy tín, youtube premium, spotify premium, canva pro, chatgpt plus',
-  image = 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1200&h=630&auto=format&fit=crop',
+  image = 'https://www.activenhanh.pro.vn/og-image.jpg',
   url = 'https://www.activenhanh.pro.vn/',
   type = 'website',
   schema 
