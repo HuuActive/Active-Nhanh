@@ -93,47 +93,21 @@ Quy tắc:
 
   return (
     <>
-      {/* Floating Buttons Container */}
-      <div 
-        className="fixed bottom-6 right-6 z-50 flex flex-col gap-4 items-end"
+      {/* Floating Button */}
+      <motion.button
+        className="fixed bottom-6 right-6 z-50 p-4 bg-brand-500 text-white rounded-full shadow-[0_0_20px_rgba(0,0,0,0.2)] hover:bg-brand-600 transition-colors flex items-center justify-center group"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => setIsOpen(true)}
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
         style={{ display: isOpen ? 'none' : 'flex' }}
       >
-        {/* Zalo Button */}
-        <motion.a
-          href="https://zalo.me/0778957345"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="shadow-[0_0_20px_rgba(0,104,255,0.3)] hover:scale-105 transition-transform flex items-center justify-center group overflow-hidden rounded-2xl"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <svg viewBox="0 0 100 100" className="w-[52px] h-[52px]" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 0h60c11.046 0 20 8.954 20 20v60c0 11.046-8.954 20-20 20H20C8.954 100 0 91.046 0 80V20C0 8.954 8.954 0 20 0z" fill="#0068FF"/>
-            <path d="M50 20c-18.778 0-34 14.17-34 31.644 0 9.176 4.382 17.433 11.36 23.003-.108 2.958-1.534 7.02-4.143 10.76a1.076 1.076 0 0 0 .717 1.666c5.095.78 10.71-.798 15.035-3.333 3.27.82 6.744 1.264 10.33 1.264 18.778 0 34-14.17 34-31.644C84 34.17 68.778 20 50 20z" fill="#fff"/>
-            <text x="50" y="61" fontFamily="Arial, sans-serif" fontSize="28" fontWeight="bold" fill="#0068FF" textAnchor="middle" letterSpacing="-0.5">Zalo</text>
-          </svg>
-          <span className="absolute right-full mr-4 bg-[#0068FF] text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-            Chat qua Zalo
-          </span>
-        </motion.a>
-
-        {/* AI Chat Button */}
-        <motion.button
-          className="p-4 bg-brand-500 text-white rounded-full shadow-[0_0_20px_rgba(0,0,0,0.2)] hover:bg-brand-600 transition-colors flex items-center justify-center group"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => setIsOpen(true)}
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <MessageSquare className="w-6 h-6" />
-          <span className="absolute right-full mr-4 bg-brand-900 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-            Cần tư vấn? Hỏi AI ngay
-          </span>
-        </motion.button>
-      </div>
+        <MessageSquare className="w-6 h-6" />
+        <span className="absolute right-full mr-4 bg-brand-900 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+          Cần tư vấn? Hỏi AI ngay
+        </span>
+      </motion.button>
 
       {/* Chat Window */}
       <AnimatePresence>
@@ -156,27 +130,12 @@ Quy tắc:
                   <p className="text-[10px] text-white/80">Trả lời tức thì 24/7</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <a 
-                  href="https://zalo.me/0778957345" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="rounded-full hover:bg-white/20 transition-colors flex items-center justify-center -mr-1"
-                  title="Gặp tư vấn viên"
-                >
-                  <svg viewBox="0 0 100 100" className="w-8 h-8 rounded-full" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M20 0h60c11.046 0 20 8.954 20 20v60c0 11.046-8.954 20-20 20H20C8.954 100 0 91.046 0 80V20C0 8.954 8.954 0 20 0z" fill="#0068FF"/>
-                    <path d="M50 20c-18.778 0-34 14.17-34 31.644 0 9.176 4.382 17.433 11.36 23.003-.108 2.958-1.534 7.02-4.143 10.76a1.076 1.076 0 0 0 .717 1.666c5.095.78 10.71-.798 15.035-3.333 3.27.82 6.744 1.264 10.33 1.264 18.778 0 34-14.17 34-31.644C84 34.17 68.778 20 50 20z" fill="#fff"/>
-                    <text x="50" y="61" fontFamily="Arial, sans-serif" fontSize="28" fontWeight="bold" fill="#0068FF" textAnchor="middle" letterSpacing="-0.5">Zalo</text>
-                  </svg>
-                </a>
-                <button 
-                  onClick={() => setIsOpen(false)}
-                  className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
+              <button 
+                onClick={() => setIsOpen(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
             {/* Messages */}
