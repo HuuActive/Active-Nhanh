@@ -148,12 +148,14 @@ async function startServer() {
         description = "Cập nhật những thông tin công nghệ mới nhất, thủ tục và mẹo sử dụng các dịch vụ số tại ActiveNhanh.";
       }
 
-      console.log(`Serving URL: ${url} | Title: ${title}`);
+      console.log(`[SSR] Serving URL: ${url} | Title: ${title}`);
+      
+      // Use global regex for replacement to ensure all instances are updated
       const html = template
-        .split('{{TITLE}}').join(title)
-        .split('{{DESCRIPTION}}').join(description)
-        .split('{{IMAGE}}').join(image)
-        .split('{{URL}}').join(ogUrl);
+        .replace(/METADATA_TITLE/g, title)
+        .replace(/METADATA_DESCRIPTION/g, description)
+        .replace(/METADATA_IMAGE/g, image)
+        .replace(/METADATA_URL/g, ogUrl);
 
       res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
     } catch (e) {

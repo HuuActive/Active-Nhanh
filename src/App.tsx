@@ -31,6 +31,7 @@ import PaymentGuideModal from './components/PaymentGuideModal';
 import GuideModal from './components/GuideModal';
 import LoginModal from './components/LoginModal';
 import UserProfileModal from './components/UserProfileModal';
+import AIChatbot from './components/AIChatbot';
 import SEO from './components/SEO';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { useProducts, useAuth, useCategories, useReviews, usePosts } from './hooks/useFirebase';
@@ -783,6 +784,8 @@ export default function App() {
           allProducts={products}
           onViewProduct={handleViewProduct}
         />
+
+        <AIChatbot products={products} />
       </div>
     </ErrorBoundary>
   );
